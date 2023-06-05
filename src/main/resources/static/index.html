@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ch">
+<head>
+    <meta charset="UTF-8">
+    <title>闽江航空</title>
+    <link rel="shortcut icon" href="img/img.png" type="image/x-icon"/>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.7.14/vue.js"></script>
+    <!-- 引入样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css" rel="stylesheet">
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/index.min.js"></script>
+    <link href="css/main.css" rel="stylesheet">
+    <link href="css/footer.css" rel="stylesheet">
+    <style>
+        #main img {
+
+        }
+
+        #main .carousel {
+            width: 80%;
+            margin: 0.5vh auto;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <link rel="stylesheet" href="css/head.css">
+    <header id="header">
+        <img src="img/img.png" alt="小图标" id="airplane_icon">
+        <a v-if="isLogin===true" href="personInfo.html" id="is-login">
+            <el-avatar :size="'large'" :src="'resources/'+userinfo.logo"></el-avatar>
+        </a>
+        <a v-if="isLogin===false" href="login.html" id="login"><p>登录|注册</p></a>
+        <a href="myOrder.html" id="order"><p>我的订单</p></a>
+        <a href="scheduled.html" id="scheduled"><p>机票预定</p></a>
+        <a href="information.html" id="information"><p>航班信息</p></a>
+        <a href="index.html" id="main_page"><p>首页</p></a>
+        <h1 id="head_text">闽江航空</h1>
+    </header>
+    <article id="main">
+        <div @click="changeUrl" class="carousel">
+            <el-carousel height="692px" @change="changePage">
+                <el-carousel-item :key="1">
+                    <img src="https://cdn.luogu.com.cn/upload/image_hosting/x08zz6it.png" alt="">
+                </el-carousel-item>
+                <el-carousel-item :key="2">
+                    <img src="https://cdn.luogu.com.cn/upload/image_hosting/6xw36pwh.png" alt="">
+                </el-carousel-item>
+                <el-carousel-item :key="3">
+                    <img src="https://cdn.luogu.com.cn/upload/image_hosting/zka95jv6.png" alt="">
+                </el-carousel-item>
+                <el-carousel-item :key="4">
+                    <img src="https://cdn.luogu.com.cn/upload/image_hosting/8x0b0p1x.png" alt="">
+                </el-carousel-item>
+            </el-carousel>
+        </div>
+    </article>
+    <footer id="footer">
+        <p>©2023 孙康平</p>
+    </footer>
+</div>
+<script src="js/vue-cookies.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+    new Vue({
+        el: "#app",
+        mounted: function () {
+            this.getUserInfo();
+        },
+        methods: {
+            changePage(now, before) {
+                this.page = now;
+            },
+            changeUrl() {
+                if (this.page === 0) {
+                    window.location = 'index.html';
+                } else if (this.page === 1) {
+                    window.location = 'information.html';
+                } else if (this.page === 2) {
+                    window.location = 'scheduled.html';
+                } else if (this.page === 3) {
+                    window.location = 'myOrder.html';
+                }
+            },
+            //获取用户信息
+            getUserInfo() {
+                // this.isLogin=false;
+                let userid = this.$cookies.get('userid');
+                if (userid === null) return;
+                axios({
+                    method: 'get',
+                    url: '/user/' + userid,
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.userinfo = res.data.data;
+                        this.isLogin = true;
+                        console.log(this.userinfo);
+                    }else if(res.data.code===304){
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location=res.data.data;
+                        },3000)
+                    } else {
+                        this.$message.error("出错啦，请稍后再试");
+                    }
+                })
+            },
+        },
+        data() {
+            return {
+                page: 0,
+                userinfo: {},
+                isLogin: false,
+            }
+        }
+    })
+</script>
+</body>
+</html>

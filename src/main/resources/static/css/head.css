@@ -1,0 +1,100 @@
+*{
+    margin: 0 0;
+}
+.app{
+    font-size: 1vw;
+}
+#header{
+    position: fixed;
+    float: top;
+    z-index: 1000;
+    margin: 0 0;
+    height: 3.26vw;
+    width: 100%;
+    background-color: #c9c9c9;
+}
+
+#airplane_icon{
+    margin-top: 0;
+    margin-left: 3.25vw;
+    float: left;
+    display: inline;
+    width: 3.25vw;
+    height: 3.25vw;
+}
+#header a p{
+    font-size:1.05vw;
+}
+#head_text{
+    font-size: 2.6vw;
+    font-family: "楷体", serif;
+    font-weight: bolder;
+    margin-top: 0;
+    margin-left: 7.16vw;
+}
+
+#login{
+    padding-top: 1vw;
+    float: right;
+    margin-right: 13vw;
+    height: 2.27vw;
+}
+#is-login{
+    padding-top: 0.32vw;
+    float: right;
+    margin-right: 13vw;
+    height: 2.27vw;
+}
+#is-login img,#is-login span{
+    width: 2.6vw;
+    height: 2.6vw;
+}
+#is-login .el-image__inner{
+    height: 2.6vw;
+    width: 2.6vw;
+}
+#main_page{
+    padding-top: 1vw;
+    float: right;
+    margin-right: 6.5vw;
+    height: 2.27vw;
+}
+
+#scheduled{
+    padding-top: 1vw;
+    float: right;
+    margin-right: 6.5vw;
+    height: 2.27vw;
+}
+
+#information{
+    padding-top: 1vw;
+    float: right;
+    margin-right: 6.5vw;
+    height: 2.27vw;
+}
+
+#order{
+    padding-top: 1vw;
+    float: right;
+    margin-right: 13vw;
+    height: 2.27vw;
+}
+
+#order:hover,#information:hover,#scheduled:hover,#main_page:hover{
+    background: rgba(169, 253, 250, 0.44);
+    margin-top: 0;
+    height: 2.27vw;
+    width: 10vw;
+    padding-top: 1vw;
+    /*padding: 20px 10px;*/
+}
+a{
+    text-align: center;
+}
+
+a:active,
+a:link,a:visited {
+    text-decoration: none;
+    color: black;
+}

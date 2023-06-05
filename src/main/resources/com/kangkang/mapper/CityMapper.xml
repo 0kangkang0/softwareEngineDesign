@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kangkang.mapper.CityMapper">
+
+    <select id="selectPageByName" resultType="com.kangkang.pojo.CityInfo">
+        select * from software_engine_design.city_info
+        <where>
+            <if test="cityInfo.cnName != null and cityInfo.cnName!=''">
+                and (airport_english_name like #{cityInfo.cnName} or airport_py_name like #{cityInfo.cnName} or cn_name like #{cityInfo.cnName})
+            </if>
+            <if test="cityInfo.cityPyName != null and cityInfo.cityPyName!=''">
+                and (city_py_name like #{cityInfo.cityPyName} or city_english_name like #{cityInfo.cityPyName})
+            </if>
+        </where>
+        limit #{begin},#{size}
+    </select>
+    <select id="selectcountByName" resultType="java.lang.Integer">
+        select count(*) from software_engine_design.city_info
+        <where>
+            <if test="cityInfo.cnName != null and cityInfo.cnName!=''">
+                and (airport_english_name like #{cityInfo.cnName} or airport_py_name like #{cityInfo.cnName} or cn_name like #{cityInfo.cnName})
+            </if>
+            <if test="cityInfo.cityPyName != null and cityInfo.cityPyName!=''">
+                and (city_py_name like #{cityInfo.cityPyName} or city_english_name like #{cityInfo.cityPyName})
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kangkang.mapper.RouteMapper">
+
+    <select id="selectList" resultType="com.kangkang.pojo.Route">
+        select *from software_engine_design.route
+        <where>
+            <if test="aircraftCode!=null">
+                and aircraft_code=#{aircraftCode}
+            </if>
+            <if test="startAirportCode!=null">
+                and start_airport_code=#{startAirportCode}
+            </if>
+            <if test="arriveAirportCode!=null">
+                and arrive_airport_code=#{arriveAirportCode}
+            </if>
+            <if test="arriveTimeId!=null">
+                and arrive_time_id=#{arriveTimeId}
+            </if>
+            <if test="id!=null">
+                and id=#{id}
+            </if>
+            <if test="startTimeId!=null">
+                and start_time_id=#{startTimeId}
+            </if>
+            <if test="routeCode!=null">
+                and route_code=#{routeCode}
+            </if>
+        </where>
+    </select>
+    <select id="selectByTimeStartEnd" resultType="com.kangkang.pojo.Route">
+        select *
+        from software_engine_design.route
+        where start_airport_code = #{start}
+          and arrive_airport_code = #{end}
+          and start_time_id in (select id
+                                from software_engine_design.timetable
+                                where scheduled >= #{startTime}
+                                  and scheduled &lt;= #{endTime}
+                                  and type = 0)
+    </select>
+    <select id="selectRouterInfoManagerById" resultType="com.kangkang.pojo.RouteInfoManager">
+        select *
+        from software_engine_design.route
+        where id = #{id};
+    </select>
+    <select id="selectAllTicketManager" resultType="com.kangkang.pojo.TicketManager">
+        select *
+        from software_engine_design.route
+    </select>
+    <select id="selectPageByInfo" resultType="com.kangkang.pojo.RouteInfoManager">
+        select * from software_engine_design.route
+        <where>
+            <if test="start != null and start != ''">
+                and start_airport_code=#{start}
+            </if>
+            <if test="end != null and end != ''">
+                and arrive_airport_code=#{end}
+            </if>
+            <if test="startTime!=null">
+                and start_time_id in (select id
+                from software_engine_design.timetable
+                where scheduled >= #{startTime}
+                and scheduled &lt;= #{endTime}
+                and type = 0)
+            </if>
+        </where>
+        limit #{begin},#{size}
+    </select>
+    <select id="selectCountByInfo" resultType="java.lang.Integer">
+        select count(*)
+        from software_engine_design.route
+        <where>
+            <if test="start != null and start != ''">
+                and start_airport_code=#{start}
+            </if>
+            <if test="end != null and end != ''">
+                and arrive_airport_code=#{end}
+            </if>
+            <if test="startTime!=null">
+                and start_time_id in (select id
+                from software_engine_design.timetable
+                where scheduled >= #{startTime}
+                and scheduled &lt;= #{endTime}
+                and type = 0)
+            </if>
+        </where>
+    </select>
+    <select id="selectTicketManagerPageByInfo" resultType="com.kangkang.pojo.TicketManager">
+        select * from software_engine_design.route
+        <where>
+            <if test="start != null and start != ''">
+                and start_airport_code=#{start}
+            </if>
+            <if test="end != null and end != ''">
+                and arrive_airport_code=#{end}
+            </if>
+            <if test="startTime!=null">
+                and start_time_id in (select id
+                from software_engine_design.timetable
+                where scheduled >= #{startTime}
+                and scheduled &lt;= #{endTime}
+                and type = 0)
+            </if>
+        </where>
+        limit #{begin},#{size}
+    </select>
+    <select id="selectTicketManagerById" resultType="com.kangkang.pojo.TicketManager">
+        select * from software_engine_design.route where id=#{id};
+    </select>
+</mapper>

@@ -1,0 +1,69 @@
+body {
+    background: url(https://cdn.luogu.com.cn/upload/image_hosting/j7ywku81.png) no-repeat;
+    background-size: 100%;
+}
+
+#login_box {
+    width: 20%;
+    height: 400px;
+    background-color: #00000050;
+    margin: 10% auto auto;
+    text-align: center;
+    border-radius: 10px;
+    padding: 50px 50px;
+}
+
+
+h2 {
+    color: #ffffff90;
+    margin-top: 5%;
+}
+
+#input_box {
+    border: 0;
+    width: 60%;
+    font-size: 15px;
+    color: #fff;
+    background: transparent;
+    border-bottom: 2px solid #fff;
+    padding: 5px 10px;
+    outline: none;
+    margin-top: 10px;
+}
+
+span {
+    color: #fff;
+}
+
+input {
+    border: 0;
+    width: 60%;
+    font-size: 15px;
+    color: #fff;
+    background: transparent;
+    border-bottom: 2px solid #fff;
+    padding: 5px 10px;
+    outline: none;
+    margin-top: 10px;
+}
+button {
+    margin-top: 50px;
+    width: 60%;
+    height: 30px;
+    border-radius: 10px;
+    border: 0;
+    color: #fff;
+    text-align: center;
+    line-height: 30px;
+    font-size: 15px;
+    background-image: linear-gradient(to right, #30cfd0, #330867);
+}
+
+#sign_up {
+    margin-top: 45%;
+    margin-left: 60%;
+}
+
+a {
+    color: #b94648;
+}

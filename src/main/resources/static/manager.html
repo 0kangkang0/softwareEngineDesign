@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>闽江航空|后台管理</title>
+    <link rel="shortcut icon" href="img/img.png" type="image/x-icon"/>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.7.14/vue.js"></script>
+    <!-- 引入样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css" rel="stylesheet">
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/index.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/boxicons/2.1.4/dist/boxicons.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/boxicons/2.1.4/css/boxicons.css" rel="stylesheet">
+    <style>
+        .header {
+            background-color: #38393f;
+            color: white;
+        }
+
+        .header .airplane_icon {
+            margin-top: 7px;
+            line-height: 50px;
+            margin-left: 50px;
+            float: left;
+            display: inline;
+            width: 50px;
+            height: 50px;
+        }
+
+        .header .head_text {
+            font-size: 40px;
+            font-family: "楷体", serif;
+            font-weight: bolder;
+            margin-top: 0;
+            margin-left: 110px;
+            line-height: 60px;
+            /*color: #fff;*/
+        }
+
+        .aside ul {
+            height: 100%;
+        }
+
+        .el-table .success-row {
+            background: #fffbf2;
+        }
+
+        .el-icon-sort {
+            margin-top: 10px;
+            -moz-transform: rotate(-90deg);
+            -webkit-transform: rotate(-90deg);
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <el-header class="header">
+            <img src="img/img.png" alt="小图标" class="airplane_icon">
+            <h1 class="head_text">闽江航空</h1>
+        </el-header>
+        <el-container>
+            <el-aside class="aside">
+                <el-menu
+                        default-active="0"
+                        class="el-menu-vertical-demo"
+                        @select="select"
+                        background-color="#545c64"
+                        text-color="#fff"
+                        active-text-color="#ffd04b">
+                    <el-menu-item index="0">
+                        <i class="el-icon-location"></i>
+                        <span slot="title">城市管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="1">
+                        <i class="el-icon-menu"></i>
+                        <span slot="title">航程管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="2">
+                        <i class="el-icon-s-ticket"></i>
+                        <span slot="title">机票管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="3">
+                        <i class="el-icon-s-order"></i>
+                        <span slot="title">订单管理</span>
+                    </el-menu-item>
+                </el-menu>
+            </el-aside>
+            <el-main>
+
+                <div v-if="showPage===0" id="cityManager">
+                    <el-form :inline="true" :model="cityManagerForm" class="demo-form-inline">
+                        <el-form-item label="城市名">
+                            <el-input v-model="cityManagerForm.cityPyName" placeholder="城市名"></el-input>
+                        </el-form-item>
+                        <el-form-item label="机场名">
+                            <el-input v-model="cityManagerForm.cnName" placeholder="机场名"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="info" @click="cityManagerSubmit" round>查询</el-button>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="addCityFormDialog=true" round>新增</el-button>
+                        </el-form-item>
+                    </el-form>
+                    <el-table
+                            :data="cityManagerTable"
+                            style="width: 100%"
+                            :header-cell-style="rowStyle"
+                            :row-class-name="tableRowClassName"
+                            :key="Math.random()"
+                            border>
+                        <el-table-column
+                                prop=cityPyName
+                                label="城市中文名"
+                                width="150"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop=cityEnglishName
+                                label="城市英文名"
+                                width="300"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop=cnName
+                                label="机场中文名"
+                                width="120"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop=airportEnglishName
+                                label="机场英文名"
+                                width="300"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop=airportPyName
+                                label="机场名拼音"
+                                width="300"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop=code
+                                label="机场编号"
+                                width="100"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop=iataApCode
+                                label="国际航协编号"
+                                width="150"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                fixed="right"
+                                label="操作"
+                                width="150"
+                                align="center">
+                            <template slot-scope="scope">
+                                <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                                    <el-button type="primary" icon="el-icon-edit" circle
+                                               @click="openUpdateCityDialog(scope.row)"></el-button>
+                                </el-tooltip>
+                                <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                    <el-button type="danger" icon="el-icon-delete" circle
+                                               @click="deleteCity(scope.row)"></el-button>
+                                </el-tooltip>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+
+                    <el-pagination
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page="currentPage"
+                            :page-sizes="[5, 10, 15, 20]"
+                            :page-size="pageSize"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :total="total">
+                    </el-pagination>
+                    <!--城市修改、新增对话框-->
+                    <el-dialog title="新增城市" :visible.sync="addCityFormDialog">
+                        <el-form ref="addNewCity" :model="cityForm" :rules="cityFormRules">
+                            <el-form-item label="城市中文名" :label-width="formLabelWidth" prop="cityPyName">
+                                <el-input v-model="cityForm.cityPyName" autocomplete="off"
+                                          placeholder="城市中文名"></el-input>
+                            </el-form-item>
+                            <el-form-item label="城市英文名" :label-width="formLabelWidth" prop="cityEnglishName">
+                                <el-input v-model="cityForm.cityEnglishName" autocomplete="off"
+                                          placeholder="城市英文名"></el-input>
+                            </el-form-item>
+                            <el-form-item label="机场中文名" :label-width="formLabelWidth" prop="cnName">
+                                <el-input v-model="cityForm.cnName" autocomplete="off" placeholder="机场中文名"></el-input>
+                            </el-form-item>
+                            <el-form-item label="机场中文拼音" :label-width="formLabelWidth" prop="airportPyName">
+                                <el-input v-model="cityForm.airportPyName" autocomplete="off"
+                                          placeholder="机场中文拼音"></el-input>
+                            </el-form-item>
+                            <el-form-item label="机场英文名" :label-width="formLabelWidth" prop="airportEnglishName">
+                                <el-input v-model="cityForm.airportEnglishName" autocomplete="off"
+                                          placeholder="机场英文名"></el-input>
+                            </el-form-item>
+                            <el-form-item label="机场编号" :label-width="formLabelWidth" prop="code">
+                                <el-input v-model="cityForm.code" autocomplete="off" placeholder="机场编号"></el-input>
+                            </el-form-item>
+                            <el-form-item label="国际航协编号" :label-width="formLabelWidth" prop="iataApCode">
+                                <el-input v-model="cityForm.iataApCode" autocomplete="off"
+                                          placeholder="国际航协编号"></el-input>
+                            </el-form-item>
+                        </el-form>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="addCityFormDialog = false">取 消</el-button>
+                            <el-button type="primary" @click="addCityInfo">确 定</el-button>
+                        </div>
+                    </el-dialog>
+
+                    <el-dialog title="修改城市信息" :visible.sync="updateCityFormDialog">
+                        <el-form ref="updateCity" :model="cityForm" :rules="cityFormRules">
+                            <el-form-item label="城市中文名" :label-width="formLabelWidth" prop="cityPyName">
+                                <el-input v-model="cityForm.cityPyName" autocomplete="off"
+                                          placeholder="城市中文名"></el-input>
+                            </el-form-item>
+                            <el-form-item label="城市英文名" :label-width="formLabelWidth" prop="cityEnglishName">
+                                <el-input v-model="cityForm.cityEnglishName" autocomplete="off"
+                                          placeholder="城市英文名"></el-input>
+                            </el-form-item>
+                            <el-form-item label="机场中文名" :label-width="formLabelWidth" prop="cnName">
+                                <el-input v-model="cityForm.cnName" autocomplete="off" placeholder="机场中文名"></el-input>
+                            </el-form-item>
+                            <el-form-item label="机场中文拼音" :label-width="formLabelWidth" prop="airportPyName">
+                                <el-input v-model="cityForm.airportPyName" autocomplete="off"
+                                          placeholder="机场中文拼音"></el-input>
+                            </el-form-item>
+                            <el-form-item label="机场英文名" :label-width="formLabelWidth" prop="airportEnglishName">
+                                <el-input v-model="cityForm.airportEnglishName" autocomplete="off"
+                                          placeholder="机场英文名"></el-input>
+                            </el-form-item>
+                            <el-form-item label="机场编号" :label-width="formLabelWidth" prop="code">
+                                <el-input v-model="cityForm.code" autocomplete="off" placeholder="机场编号"></el-input>
+                            </el-form-item>
+                            <el-form-item label="国际航协编号" :label-width="formLabelWidth" prop="iataApCode">
+                                <el-input v-model="cityForm.iataApCode" autocomplete="off"
+                                          placeholder="国际航协编号"></el-input>
+                            </el-form-item>
+                        </el-form>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="updateCityFormDialog = false">取 消</el-button>
+                            <el-button type="primary" @click="updateCity">确 定</el-button>
+                        </div>
+                    </el-dialog>
+                </div>
+                <div v-else-if="showPage===1" id="voyageManager">
+                    <el-form :inline="true" :model="voyageManagerForm" class="demo-form-inline">
+                        <el-form-item label="出发城市">
+                            <el-cascader
+                                    ref="cascaderAddr"
+                                    placeholder="出发城市"
+                                    v-model="voyageManagerForm.value"
+                                    :options="options"
+                                    :show-all-levels="false">
+                            </el-cascader>
+                        </el-form-item>
+                        <i class="el-icon-sort" style=""></i>
+                        <el-form-item label="到达城市">
+                            <el-cascader
+                                    ref="cascaderAddr2"
+                                    placeholder="到达城市"
+                                    v-model="voyageManagerForm.valueArrive"
+                                    :options="options"
+                                    :show-all-levels="false">
+                            </el-cascader>
+                        </el-form-item>
+                        <el-form-item label="出发时间">
+                            <el-date-picker
+                                    v-model="voyageManagerForm.value1"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
+                                    placeholder="选择日期">
+                            </el-date-picker>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="info" @click="voyageFormSubmit" round>查询</el-button>
+                            <el-button type="primary" @click="addVoyageFormDialog=true" round>新增</el-button>
+                        </el-form-item>
+                    </el-form>
+
+                    <el-table
+                            :data="voyageManagerTable"
+                            style="width: 100%"
+                            :row-class-name="tableRowClassName"
+                            :header-cell-style="rowStyle"
+                            :key="Math.random()"
+                            border>
+                        <el-table-column
+                                prop=routeCode
+                                label="航班号"
+                                align="center"
+                                width="200">
+                        </el-table-column>
+                        <el-table-column
+                                prop=aircraftCode
+                                label="飞机代码"
+                                align="center"
+                                width="100">
+                        </el-table-column>
+                        <el-table-column label="出发信息">
+                            <el-table-column label="出发城市">
+                                <el-table-column
+                                        prop="startCity.cityPyName"
+                                        label="城市名"
+                                        align="center"
+                                        width="100">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="startCity.cnName"
+                                        label="机场名"
+                                        align="center"
+                                        width="100">
+                                </el-table-column>
+                            </el-table-column>
+                            <el-table-column label="出发时间">
+                                <el-table-column
+                                        prop="startTime.scheduled"
+                                        label="预计时间"
+                                        align="center"
+                                        width="200">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="startTime.actual"
+                                        label="实际时间"
+                                        align="center"
+                                        width="200">
+                                </el-table-column>
+                            </el-table-column>
+                        </el-table-column>
+                        <el-table-column label="到达信息">
+                            <el-table-column label="到达城市">
+                                <el-table-column
+                                        prop="arriveCity.cityPyName"
+                                        label="城市名"
+                                        align="center"
+                                        width="100">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="arriveCity.cnName"
+                                        label="机场名"
+                                        align="center"
+                                        width="100">
+                                </el-table-column>
+                            </el-table-column>
+                            <el-table-column label="到达时间">
+                                <el-table-column
+                                        prop="arriveTime.scheduled"
+                                        label="预计时间"
+                                        align="center"
+                                        width="200">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="arriveTime.actual"
+                                        label="实际时间"
+                                        align="center"
+                                        width="200">
+                                </el-table-column>
+                            </el-table-column>
+                        </el-table-column>
+                        <el-table-column
+                                prop="status"
+                                label="状态"
+                                align="center"
+                                width="150">
+                        </el-table-column>
+                        <el-table-column
+                                fixed="right"
+                                label="操作"
+                                width="150"
+                                align="center">
+                            <template slot-scope="scope">
+                                <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                                    <el-button type="primary" icon="el-icon-edit"
+                                               @click="openUpdateVoyageDialog(scope.row)" circle></el-button>
+                                </el-tooltip>
+                                <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                    <el-button type="danger" icon="el-icon-delete" @click="deleteVoyage(scope.row)"
+                                               circle></el-button>
+                                </el-tooltip>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+
+                    <el-pagination
+                            @size-change=" handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page="currentPage"
+                            :page-sizes="[5, 10, 15, 20]"
+                            :page-size="pageSize"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :total="total">
+                    </el-pagination>
+                    <el-dialog title="添加航线信息" :visible.sync="addVoyageFormDialog">
+                        <el-form ref="addNewVoyage" :model="voyageForm" status-icon :rules="voyageFormRules">
+                            <el-form-item label="飞机编号" :label-width="formLabelWidth"
+                                          prop="aircraftCode">
+                                <el-input v-model="voyageForm.aircraftCode" autocomplete="off"
+                                          placeholder="飞机编号"></el-input>
+                            </el-form-item>
+                            <el-form-item label="出发城市" :label-width="formLabelWidth"
+                                          prop="startAirportCode">
+                                <el-cascader
+                                        placeholder="出发城市"
+                                        v-model="voyageForm.startAirportCode"
+                                        :options="options"
+                                        :show-all-levels="false">
+                                </el-cascader>
+                            </el-form-item>
+                            <el-form-item label="到达城市" :label-width="formLabelWidth"
+                                          prop="arriveAirportCode">
+                                <el-cascader
+                                        placeholder="到达城市"
+                                        v-model="voyageForm.arriveAirportCode"
+                                        :options="options"
+                                        :show-all-levels="false">
+                                </el-cascader>
+                            </el-form-item>
+                            <el-form-item label="预定出发时间" :label-width="formLabelWidth"
+                                          prop="startTime.scheduled">
+                                <el-date-picker
+                                        v-model="voyageForm.startTime.scheduled"
+                                        type="datetime"
+                                        value-format="yyyy-MM-dd HH:mm:ss"
+                                        placeholder="预定出发时间">
+                                </el-date-picker>
+                            </el-form-item>
+                            <el-form-item label="预定到达时间" :label-width="formLabelWidth"
+                                          prop="arriveTime.scheduled">
+                                <el-date-picker
+                                        v-model="voyageForm.arriveTime.scheduled"
+                                        type="datetime"
+                                        value-format="yyyy-MM-dd HH:mm:ss"
+                                        placeholder="预定到达时间">
+                                </el-date-picker>
+                            </el-form-item>
+                        </el-form>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="addVoyageFormDialog = false">取 消</el-button>
+                            <el-button type="primary" @click="addVoyage">确 定</el-button>
+                        </div>
+                    </el-dialog>
+
+                    <el-dialog title="修改航线信息" :visible.sync="updateVoyageDialog">
+                        <el-form ref="updateVoyage" :model="voyageForm" status-icon :rules="voyageFormRules">
+                            <el-form-item label="飞机编号" :label-width="formLabelWidth"
+                                          prop="aircraftCode">
+                                <el-input v-model="voyageForm.aircraftCode" autocomplete="off"
+                                          placeholder="飞机编号"></el-input>
+                            </el-form-item>
+                            <el-form-item label="出发城市" :label-width="formLabelWidth"
+                                          prop="startAirportCode">
+                                <el-cascader
+                                        placeholder="出发城市"
+                                        v-model="voyageForm.startAirportCode"
+                                        :options="options"
+                                        :show-all-levels="false">
+                                </el-cascader>
+                            </el-form-item>
+                            <el-form-item label="到达城市" :label-width="formLabelWidth"
+                                          prop="arriveAirportCode">
+                                <el-cascader
+                                        placeholder="到达城市"
+                                        v-model="voyageForm.arriveAirportCode"
+                                        :options="options"
+                                        :show-all-levels="false">
+                                </el-cascader>
+                            </el-form-item>
+                            <el-form-item label="预计出发时间" :label-width="formLabelWidth"
+                                          prop="startTime.scheduled">
+                                <el-date-picker
+                                        v-model="voyageForm.startTime.scheduled"
+                                        type="datetime"
+                                        value-format="yyyy-MM-dd HH:mm:ss"
+                                        placeholder="预定出发时间">
+                                </el-date-picker>
+                            </el-form-item>
+                            <el-form-item label="实际出发时间" :label-width="formLabelWidth"
+                                          prop="startTime.estimated">
+                                <el-date-picker
+                                        v-model="voyageForm.startTime.estimated"
+                                        type="datetime"
+                                        value-format="yyyy-MM-dd HH:mm:ss"
+                                        placeholder="实际出发时间">
+                                </el-date-picker>
+                            </el-form-item>
+                            <el-form-item label="预计到达时间" :label-width="formLabelWidth"
+                                          prop="arriveTime.scheduled">
+                                <el-date-picker
+                                        v-model="voyageForm.arriveTime.scheduled"
+                                        type="datetime"
+                                        value-format="yyyy-MM-dd HH:mm:ss"
+                                        placeholder="预定到达时间">
+                                </el-date-picker>
+                            </el-form-item>
+                            <el-form-item label="实际到达时间" :label-width="formLabelWidth"
+                                          prop="arriveTime.estimated">
+                                <el-date-picker
+                                        v-model="voyageForm.arriveTime.estimated"
+                                        type="datetime"
+                                        value-format="yyyy-MM-dd HH:mm:ss"
+                                        placeholder="实际到达时间">
+                                </el-date-picker>
+                            </el-form-item>
+                            <el-form-item label="航班状态" :label-width="formLabelWidth" prop="status">
+                                <el-select v-model="voyageForm.status" placeholder="请选择航班状态" value="">
+                                    <el-option
+                                            v-for="item in voyageStatus"
+                                            :key="item.value"
+                                            :label="item.label"
+                                            :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-form>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="updateVoyageDialog = false">取 消</el-button>
+                            <el-button type="primary" @click="updateVoyage">确 定</el-button>
+                        </div>
+                    </el-dialog>
+                </div>
+
+                <div v-else-if="showPage===2" id="ticketManager">
+                    <el-form :inline="true" :model="ticketManagerForm" class="demo-form-inline">
+                        <el-form-item label="出发城市">
+                            <el-cascader
+                                    ref="cascaderAddr"
+                                    placeholder="出发城市"
+                                    v-model="ticketManagerForm.value"
+                                    :options="options"
+                                    :show-all-levels="false">
+                            </el-cascader>
+                        </el-form-item>
+                        <i class="el-icon-sort" style=""></i>
+                        <el-form-item label="到达城市">
+                            <el-cascader
+                                    ref="cascaderAddr2"
+                                    placeholder="到达城市"
+                                    v-model="ticketManagerForm.valueArrive"
+                                    :options="options"
+                                    :show-all-levels="false">
+                            </el-cascader>
+                        </el-form-item>
+                        <el-form-item label="选择日期">
+                            <el-date-picker
+                                    v-model="ticketManagerForm.value1"
+                                    type="date"
+                                    value-format="yyyy-MM-dd"
+                                    placeholder="选择日期">
+                            </el-date-picker>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="info" @click="ticketFormSubmit" round>查询</el-button>
+                        </el-form-item>
+                    </el-form>
+                    <el-table
+                            :data="ticketManagerData"
+                            style="width: 100%"
+                            :row-class-name="tableRowClassName"
+                            :header-cell-style="rowStyle"
+                            :key="Math.random()"
+                            border>
+                        <el-table-column
+                                label="展开"
+                                type="expand"
+                                width="50">
+                            <template slot-scope="scope_father">
+                                <el-table
+                                        :data="scope_father.row.tickets"
+                                        style="width: 100%"
+                                        :row-class-name="tableRowClassName"
+                                        :header-cell-style="rowStyle"
+                                        :key="Math.random()"
+                                        border>
+                                    <el-table-column
+                                            prop="id"
+                                            label="编号"
+                                            align="center"
+                                            width="200">
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="type"
+                                            label="类型"
+                                            align="center"
+                                            width="200">
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="price"
+                                            label="价格"
+                                            align="center"
+                                            width="200">
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="num"
+                                            label="数量"
+                                            align="center"
+                                            width="200">
+                                    </el-table-column>
+                                    <el-table-column
+                                            label="操作"
+                                            width="150"
+                                            align="center">
+                                        <template slot-scope="scope">
+                                            <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                                                <el-button type="primary" icon="el-icon-edit"
+                                                           @click="openUpdateTicketDialog(scope_father.row,scope.row)"
+                                                           circle></el-button>
+                                            </el-tooltip>
+                                            <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                                <el-button type="danger" icon="el-icon-delete"
+                                                           @click="deleteTicket(scope.row)" circle></el-button>
+                                            </el-tooltip>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                prop=routeCode
+                                label="航班号"
+                                align="center"
+                                width="200">
+                        </el-table-column>
+                        <el-table-column
+                                prop=aircraftCode
+                                label="飞机代码"
+                                align="center"
+                                width="100">
+                        </el-table-column>
+                        <el-table-column label="出发信息">
+                            <el-table-column label="出发城市">
+                                <el-table-column
+                                        prop="startCity.cityPyName"
+                                        label="城市名"
+                                        align="center"
+                                        width="100">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="startCity.cnName"
+                                        label="机场名"
+                                        align="center"
+                                        width="100">
+                                </el-table-column>
+                            </el-table-column>
+                            <el-table-column label="出发时间">
+                                <el-table-column
+                                        prop="startTime.scheduled"
+                                        label="预计时间"
+                                        align="center"
+                                        width="200">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="startTime.actual"
+                                        label="实际时间"
+                                        align="center"
+                                        width="200">
+                                </el-table-column>
+                            </el-table-column>
+                        </el-table-column>
+                        <el-table-column label="到达信息">
+                            <el-table-column label="到达城市">
+                                <el-table-column
+                                        prop="arriveCity.cityPyName"
+                                        label="城市名"
+                                        align="center"
+                                        width="100">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="arriveCity.cnName"
+                                        label="机场名"
+                                        align="center"
+                                        width="100">
+                                </el-table-column>
+                            </el-table-column>
+                            <el-table-column label="到达时间">
+                                <el-table-column
+                                        prop="arriveTime.scheduled"
+                                        label="预计时间"
+                                        align="center"
+                                        width="200">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="arriveTime.actual"
+                                        label="实际时间"
+                                        align="center"
+                                        width="200">
+                                </el-table-column>
+                            </el-table-column>
+                        </el-table-column>
+                        <el-table-column
+                                fixed="right"
+                                label="操作"
+                                align="center"
+                                width="100">
+                            <template slot-scope="scope">
+                                <el-tooltip class="item" effect="dark" content="添加机票" placement="top">
+                                    <el-button type="primary" icon="el-icon-plus"
+                                               @click="openAddTicketDialog(scope.row)"
+                                               circle></el-button>
+                                </el-tooltip>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+
+                    <el-pagination
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page="currentPage"
+                            :page-sizes="[5, 10, 15, 20]"
+                            :page-size="pageSize"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :total="total">
+                    </el-pagination>
+                    <el-dialog title="添加机票" :visible.sync="addTicketDialog" width="75%">
+                        <el-descriptions class="margin-top" title="航程信息" :column="3" border>
+                            <el-descriptions-item>
+                                <template slot="label">
+                                    <i class='bx bxs-plane'></i>
+                                    飞机编码
+                                </template>
+                                {{addTicketDialogRouterInfo.aircraftCode}}
+                            </el-descriptions-item>
+                            <el-descriptions-item>
+                                <template slot="label">
+                                    <i class='bx bxs-plane-take-off'></i>
+                                    出发城市
+                                </template>
+                                {{addTicketDialogRouterInfo.startCity.cityPyName}}
+                            </el-descriptions-item>
+                            <el-descriptions-item>
+                                <template slot="label">
+                                    <i class='bx bxs-plane-land'></i>
+                                    到达城市
+                                </template>
+                                {{addTicketDialogRouterInfo.arriveCity.cityPyName}}
+                            </el-descriptions-item>
+                            <el-descriptions-item>
+                                <template slot="label">
+                                    <i class='bx bx-directions'></i>
+                                    航班号
+                                </template>
+                                {{addTicketDialogRouterInfo.routeCode}}
+                            </el-descriptions-item>
+                            <el-descriptions-item>
+                                <template slot="label">
+                                    <i class='bx bxs-hourglass-top'></i>
+                                    起飞时间
+                                </template>
+                                <template v-if="addTicketDialogRouterInfo.startTime.estimated!==null">
+                                    {{addTicketDialogRouterInfo.startTime.estimated}}
+                                </template>
+                                <template v-else>
+                                    {{addTicketDialogRouterInfo.startTime.scheduled}}
+                                </template>
+                            </el-descriptions-item>
+                            <el-descriptions-item>
+                                <template slot="label">
+                                    <i class='bx bxs-hourglass-bottom'></i>
+                                    到达时间
+                                </template>
+                                <template v-if="addTicketDialogRouterInfo.arriveTime.estimated!==null">
+                                    {{addTicketDialogRouterInfo.arriveTime.estimated}}
+                                </template>
+                                <template v-else>
+                                    {{addTicketDialogRouterInfo.arriveTime.scheduled}}
+                                </template>
+                            </el-descriptions-item>
+                        </el-descriptions>
+                        <h3>机票信息</h3>
+                        <el-form ref="addNewTicket" :model="ticketForm" class="demo-form-inline"
+                                 :rules="ticketFormRules">
+                            <el-form-item label="机舱类型" :label-width="formLabelWidth"
+                                          prop="type">
+                                <el-input v-model="ticketForm.type" autocomplete="off"
+                                          placeholder="请输入机舱类型" style="width: 80%"></el-input>
+                            </el-form-item>
+                            <el-form-item label="票价" :label-width="formLabelWidth"
+                                          prop="price">
+                                <el-input v-model="ticketForm.price" autocomplete="off"
+                                          placeholder="请输入票价" style="width: 80%"></el-input>
+                            </el-form-item>
+                            <el-form-item label="数量" :label-width="formLabelWidth"
+                                          prop="num">
+                                <el-input v-model="ticketForm.num" autocomplete="off"
+                                          placeholder="请输入数量" style="width: 80%"></el-input>
+                            </el-form-item>
+                        </el-form>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="addTicketDialog = false">取 消</el-button>
+                            <el-button type="primary" @click="addTicket">确 定</el-button>
+                        </div>
+                    </el-dialog>
+                    <!--修改机票-->
+                    <el-dialog title="修改机票信息" :visible.sync="updateTicketDialog" width="75%">
+                        <el-descriptions class="margin-top" title="航程信息" :column="3" border>
+                            <el-descriptions-item>
+                                <template slot="label">
+                                    <i class='bx bxs-plane'></i>
+                                    飞机编码
+                                </template>
+                                {{addTicketDialogRouterInfo.aircraftCode}}
+                            </el-descriptions-item>
+                            <el-descriptions-item>
+                                <template slot="label">
+                                    <i class='bx bxs-plane-take-off'></i>
+                                    出发城市
+                                </template>
+                                {{addTicketDialogRouterInfo.startCity.cityPyName}}
+                            </el-descriptions-item>
+                            <el-descriptions-item>
+                                <template slot="label">
+                                    <i class='bx bxs-plane-land'></i>
+                                    到达城市
+                                </template>
+                                {{addTicketDialogRouterInfo.arriveCity.cityPyName}}
+                            </el-descriptions-item>
+                            <el-descriptions-item>
+                                <template slot="label">
+                                    <i class='bx bx-directions'></i>
+                                    航班号
+                                </template>
+                                {{addTicketDialogRouterInfo.routeCode}}
+                            </el-descriptions-item>
+                            <el-descriptions-item>
+                                <template slot="label">
+                                    <i class='bx bxs-hourglass-top'></i>
+                                    起飞时间
+                                </template>
+                                <template v-if="addTicketDialogRouterInfo.startTime.estimated!==null">
+                                    {{addTicketDialogRouterInfo.startTime.estimated}}
+                                </template>
+                                <template v-else>
+                                    {{addTicketDialogRouterInfo.startTime.scheduled}}
+                                </template>
+                            </el-descriptions-item>
+                            <el-descriptions-item>
+                                <template slot="label">
+                                    <i class='bx bxs-hourglass-bottom'></i>
+                                    到达时间
+                                </template>
+                                <template v-if="addTicketDialogRouterInfo.arriveTime.estimated!==null">
+                                    {{addTicketDialogRouterInfo.arriveTime.estimated}}
+                                </template>
+                                <template v-else>
+                                    {{addTicketDialogRouterInfo.arriveTime.scheduled}}
+                                </template>
+                            </el-descriptions-item>
+                        </el-descriptions>
+                        <h3>机票信息</h3>
+                        <el-form ref="updateTicket" :model="ticketForm" class="demo-form-inline"
+                                 :rules="ticketFormRules">
+                            <el-form-item label="机舱类型" :label-width="formLabelWidth"
+                                          prop="type">
+                                <el-input v-model="ticketForm.type" autocomplete="off"
+                                          placeholder="请输入机舱类型" style="width: 80%"></el-input>
+                            </el-form-item>
+                            <el-form-item label="票价" :label-width="formLabelWidth"
+                                          prop="price">
+                                <el-input v-model="ticketForm.price" autocomplete="off"
+                                          placeholder="请输入票价" style="width: 80%"></el-input>
+                            </el-form-item>
+                            <el-form-item label="数量" :label-width="formLabelWidth"
+                                          prop="num">
+                                <el-input v-model="ticketForm.num" autocomplete="off"
+                                          placeholder="请输入数量" style="width: 80%"></el-input>
+                            </el-form-item>
+                        </el-form>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="updateTicketDialog = false">取 消</el-button>
+                            <el-button type="primary" @click="updateTicket">确 定</el-button>
+                        </div>
+                    </el-dialog>
+                </div>
+
+                <div v-else-if="showPage===3" id="orderManager">
+                    <el-form :inline="true" :model="orderManagerForm" class="demo-form-inline">
+                        <el-form-item label="乘客名">
+                            <el-input v-model="orderManagerForm.name" placeholder="乘客名"></el-input>
+                        </el-form-item>
+                        <el-form-item label="证件号">
+                            <el-input v-model="orderManagerForm.idNumber" placeholder="证件号"></el-input>
+                        </el-form-item>
+                        <el-form-item label="电话">
+                            <el-input v-model="orderManagerForm.tel" placeholder="电话"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="info" @click="orderFormSubmit" round>查询</el-button>
+                        </el-form-item>
+                    </el-form>
+
+                    <el-table
+                            :data="orderManagerData"
+                            style="width: 100%"
+                            :header-cell-style="rowStyle"
+                            :row-class-name="tableRowClassName"
+                            :key="Math.random()"
+                            border>
+                        <el-table-column
+                                prop="name"
+                                label="姓名"
+                                align="center"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="idNumber"
+                                label="证件号"
+                                align="center"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="tel"
+                                label="电话"
+                                align="center"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="mail"
+                                label="邮箱"
+                                align="center"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                label="机票信息">
+                            <el-table-column
+                                    prop="ticket.price"
+                                    label="价格"
+                                    align="center"
+                                    width="180">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="ticket.type"
+                                    label="机舱"
+                                    align="center"
+                                    width="180">
+                            </el-table-column>
+                        </el-table-column>
+                        <el-table-column
+                                label="路线信息">
+                            <el-table-column
+                                    prop="route.startCity.cityPyName"
+                                    label="起飞机场"
+                                    align="center"
+                                    width="180">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="route.arriveCity.cityPyName"
+                                    label="到达机场"
+                                    align="center"
+                                    width="180">
+                            </el-table-column>
+                            <el-table-column
+                                    label="起飞时间"
+                                    align="center"
+                                    width="180">
+                                <template slot-scope="scope">
+                                    <p v-if="scope.row.route.startTime.actual!==null">
+                                        {{scope.row.route.startTime.actual}}</p>
+                                    <p v-else>{{scope.row.route.startTime.scheduled}}</p>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                    label="到达时间"
+                                    align="center"
+                                    width="180">
+                                <template slot-scope="scope">
+                                    <p v-if="scope.row.route.arriveTime.actual!==null">
+                                        {{scope.row.route.arriveTime.actual}}</p>
+                                    <p v-else>{{scope.row.route.arriveTime.scheduled}}</p>
+                                </template>
+                            </el-table-column>
+                        </el-table-column>
+                        <el-table-column
+                                prop=status
+                                label="状态"
+                                align="center"
+                                width="180">
+                            <template slot-scope="scope">
+                                <p v-if="scope.row.status===1">已订票</p>
+                                <p v-else-if="scope.row.status===2">已取消</p>
+                                <p v-else-if="scope.row.status===3">已检票</p>
+                                <p v-else-if="scope.row.status===4">已值机</p>
+                                <p v-else-if="scope.row.status===5">已改签</p>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                label="操作"
+                                align="center"
+                                width="180"
+                                fixed="right">
+                            <template slot-scope="scope">
+                                <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                                    <el-button type="primary" icon="el-icon-edit"
+                                               @click="openUpdateOrderDialog(scope.row)"
+                                               circle></el-button>
+                                </el-tooltip>
+                                <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                    <el-button type="danger" icon="el-icon-delete" @click="deleteOrder(scope.row)"
+                                               circle></el-button>
+                                </el-tooltip>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-pagination
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page="currentPage"
+                            :page-sizes="[5, 10, 15, 20]"
+                            :page-size="pageSize"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :total="total">
+                    </el-pagination>
+                    <el-dialog title="修改订单" :visible.sync="updateOrderDialog" width="75%">
+                        <el-form ref="updateOrder" :model="orderForm" class="demo-form-inline" :rules="orderFormRules">
+                            <el-form-item label="乘客名" :label-width="formLabelWidth"
+                                          prop="name">
+                                <el-input v-model="orderForm.name" autocomplete="off"
+                                          placeholder="请输入乘客名" style="width: 80%"></el-input>
+                            </el-form-item>
+                            <el-form-item label="电话" :label-width="formLabelWidth"
+                                          prop="tel">
+                                <el-input v-model="orderForm.tel" autocomplete="off"
+                                          placeholder="请输入电话" style="width: 80%"></el-input>
+                            </el-form-item>
+                            <el-form-item label="证件号" :label-width="formLabelWidth"
+                                          prop="idNumber">
+                                <el-input v-model="orderForm.idNumber" autocomplete="off"
+                                          placeholder="请输入证件号" style="width: 80%"></el-input>
+                            </el-form-item>
+                            <el-form-item label="邮箱" :label-width="formLabelWidth">
+                                <el-input v-model="orderForm.mail" autocomplete="off"
+                                          placeholder="请输入邮箱" style="width: 80%"></el-input>
+                            </el-form-item>
+                            <el-form-item label="状态" :label-width="formLabelWidth"
+                                          prop="status">
+                                <el-select v-model="orderForm.status" placeholder="请选择" value="">
+                                    <el-option
+                                            v-for="item in orderStatusOptions"
+                                            :key="item.value"
+                                            :label="item.label"
+                                            :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="机票编号" :label-width="formLabelWidth"
+                                          prop="ticketId">
+                                <el-input @blur="getTicketInfoInOrder(orderForm.ticketId)" v-model="orderForm.ticketId"
+                                          autocomplete="off"
+                                          placeholder="请输入机票编号" style="width: 80%"></el-input>
+                            </el-form-item>
+                            <el-descriptions class="margin-top" title="航程信息" :column="3" border>
+                                <el-descriptions-item>
+                                    <template slot="label">
+                                        <i class='bx bxs-plane'></i>
+                                        飞机编码
+                                    </template>
+                                    {{updateOrderTicket.aircraftCode}}
+                                </el-descriptions-item>
+                                <el-descriptions-item>
+                                    <template slot="label">
+                                        <i class='bx bxs-plane-take-off'></i>
+                                        出发城市
+                                    </template>
+                                    {{updateOrderTicket.startCity.cityPyName}}
+                                </el-descriptions-item>
+                                <el-descriptions-item>
+                                    <template slot="label">
+                                        <i class='bx bxs-plane-land'></i>
+                                        到达城市
+                                    </template>
+                                    {{updateOrderTicket.arriveCity.cityPyName}}
+                                </el-descriptions-item>
+                                <el-descriptions-item>
+                                    <template slot="label">
+                                        <i class='bx bx-directions'></i>
+                                        航班号
+                                    </template>
+                                    {{updateOrderTicket.routeCode}}
+                                </el-descriptions-item>
+                                <el-descriptions-item>
+                                    <template slot="label">
+                                        <i class='bx bxs-hourglass-top'></i>
+                                        起飞时间
+                                    </template>
+                                    <template v-if="updateOrderTicket.startTime.estimated!==null">
+                                        {{updateOrderTicket.startTime.estimated}}
+                                    </template>
+                                    <template v-else>
+                                        {{updateOrderTicket.startTime.scheduled}}
+                                    </template>
+                                </el-descriptions-item>
+                                <el-descriptions-item>
+                                    <template slot="label">
+                                        <i class='bx bxs-hourglass-bottom'></i>
+                                        到达时间
+                                    </template>
+                                    <template v-if="updateOrderTicket.arriveTime.estimated!==null">
+                                        {{updateOrderTicket.arriveTime.estimated}}
+                                    </template>
+                                    <template v-else>
+                                        {{updateOrderTicket.arriveTime.scheduled}}
+                                    </template>
+                                </el-descriptions-item>
+                                <el-descriptions-item>
+                                    <template slot="label">
+                                        <i class='bx bx-notepad'></i>
+                                        机舱类型
+                                    </template>
+                                    {{updateOrderTicket.tickets.type}}
+                                </el-descriptions-item>
+                                <el-descriptions-item>
+                                    <template slot="label">
+                                        <i class='el-icon-s-finance'></i>
+                                        航班号
+                                    </template>
+                                    {{updateOrderTicket.tickets.price}}
+                                </el-descriptions-item>
+                            </el-descriptions>
+                        </el-form>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="updateOrderDialog = false">取 消</el-button>
+                            <el-button type="primary" @click="updateOrder">确 定</el-button>
+                        </div>
+                    </el-dialog>
+                </div>
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        mounted() {
+            this.getCityInfo();
+            this.cityManagerSubmit();
+        },
+        watch: {
+            'addCityFormDialog': function () {
+                if (this.addCityFormDialog === false) {
+                    this.clearCityForm();
+                    this.cityManagerSubmit();
+                }
+            },
+            'updateCityFormDialog': function () {
+                if (this.updateCityFormDialog === false) {
+                    this.clearCityForm();
+                    this.cityManagerSubmit();
+                }
+            },
+            'addVoyageFormDialog': function () {
+                if (this.addCityFormDialog === false) {
+                    this.clearVoyageForm();
+                    this.voyageFormSubmit();
+                }
+            },
+            'updateVoyageDialog': function () {
+                if (this.updateVoyageDialog === false) {
+                    this.clearVoyageForm();
+                    this.voyageFormSubmit();
+                }
+            },
+            'addTicketDialog': function () {
+                if (this.addTicketDialog === false) {
+                    this.clearTicketForm();
+                    this.ticketFormSubmit();
+                }
+            },
+            'updateTicketDialog': function () {
+                if (this.updateTicketDialog === false) {
+                    this.clearTicketForm();
+                    this.ticketFormSubmit();
+                }
+            },
+        },
+        methods: {
+            initData() {
+                this.currentPage = 1;
+                this.pageSize = 5;
+                this.total = 0;
+            },
+            handleSizeChange(val) {
+                this.pageSize = val;
+                if (this.showPage === 0) {
+                    this.cityManagerSubmit()
+                } else if (this.showPage === 1) {
+                    this.voyageFormSubmit();
+                } else if (this.showPage === 2) {
+                    this.ticketFormSubmit();
+                } else if (this.showPage === 3) {
+                    this.orderFormSubmit();
+                }
+            },
+            handleCurrentChange(val) {
+                this.currentPage = val;
+                if (this.showPage === 0) {
+                    this.cityManagerSubmit()
+                } else if (this.showPage === 1) {
+                    this.voyageFormSubmit();
+                } else if (this.showPage === 2) {
+                    this.ticketFormSubmit();
+                } else if (this.showPage === 3) {
+                    this.orderFormSubmit();
+                }
+            },
+            select(index, indexPath) {
+                this.initData();
+                this.showPage = parseInt(index);
+                if (index === '0') {
+                    this.cityManagerSubmit();
+                } else if (index === '1') {
+                    this.voyageFormSubmit();
+                } else if (index === '2') {
+                    this.ticketFormSubmit();
+                } else if (index === '3') {
+                    this.orderFormSubmit();
+                }
+            },
+            //获得订单数据
+            orderFormSubmit() {
+                axios({
+                    method: 'post',
+                    url: '/order/manager/' + this.currentPage + '/' + this.pageSize,
+                    data: this.orderManagerForm,
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.total = res.data.data.total;
+                        this.orderManagerData = res.data.data.rows;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错了，请稍后再试");
+                    }
+                    if (this.currentPage - 1 > this.total / this.pageSize) {
+                        this.currentPage = 1;
+                        this.orderFormSubmit();
+                    }
+                })
+            },
+            //获得机票数据
+            ticketFormSubmit() {
+                axios({
+                    method: 'post',
+                    url: '/ticket/manager/' + this.currentPage + '/' + this.pageSize,
+                    data: {
+                        startCity: this.ticketManagerForm.value[1],
+                        endCity: this.ticketManagerForm.valueArrive[1],
+                        time: this.ticketManagerForm.value1,
+                    }
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.total = res.data.data.total;
+                        this.ticketManagerData = res.data.data.rows;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错了，请稍后再试");
+                    }
+                    if (this.currentPage - 1 > this.total / this.pageSize) {
+                        this.currentPage = 1;
+                        this.ticketFormSubmit();
+                    }
+                })
+            },
+            //获得航班数据
+            voyageFormSubmit() {
+                axios({
+                    method: 'post',
+                    url: '/router/manager/' + this.currentPage + '/' + this.pageSize,
+                    data: {
+                        startCity: this.voyageManagerForm.value[1],
+                        endCity: this.voyageManagerForm.valueArrive[1],
+                        time: this.voyageManagerForm.value1,
+                    }
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.total = res.data.data.total;
+                        this.voyageManagerTable = res.data.data.rows;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错了，请稍后再试");
+                    }
+                    if (this.currentPage - 1 > this.total / this.pageSize) {
+                        this.currentPage = 1;
+                        this.voyageFormSubmit();
+                    }
+                })
+            },
+            //获得城市信息
+            getCityInfo() {
+                axios({
+                    method: 'get',
+                    url: '/city',
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.options = res.data.data;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错啦，请稍后再试");
+                    }
+                })
+            },
+            //    城市管理表单提交
+            cityManagerSubmit() {
+                axios({
+                    method: 'post',
+                    url: '/city/manager/' + this.currentPage + '/' + this.pageSize,
+                    data: this.cityManagerForm,
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.cityManagerTable = res.data.data.rows;
+                        this.total = res.data.data.total;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错了，请稍后再试")
+                    }
+                    if (this.currentPage - 1 > this.total / this.pageSize) {
+                        this.currentPage = 1;
+                        this.cityManagerSubmit();
+                    }
+                })
+            },
+            //打开表单
+            openUpdateCityDialog(row) {
+                axios({
+                    method: 'get',
+                    url: '/city/' + row.id,
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.cityForm = res.data.data;
+                        this.updateCityFormDialog = true;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错了，请稍后再试");
+                    }
+                })
+            },
+            openUpdateVoyageDialog(row) {
+                axios({
+                    method: 'get',
+                    url: '/router/manager/' + row.id,
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.voyageForm = res.data.data;
+                        this.voyageForm.startAirportCode = [this.voyageForm.startCity.cityEnglishName[0], this.voyageForm.startCity.iataApCode];
+                        this.voyageForm.arriveAirportCode = [this.voyageForm.arriveCity.cityEnglishName[0], this.voyageForm.arriveCity.iataApCode];
+                        this.updateVoyageDialog = true;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错了，请稍后再试");
+                    }
+                })
+            },
+            openAddTicketDialog(row) {
+                this.ticketForm.routeId = row.id;
+                this.addTicketDialogRouterInfo = row;
+                this.addTicketDialog = true;
+            },
+            openUpdateTicketDialog(row_father, row) {
+                this.addTicketDialogRouterInfo = row_father;
+                this.ticketForm = row;
+                this.updateTicketDialog = true;
+            },
+            openUpdateOrderDialog(row) {
+                this.getTicketInfoInOrder(row.ticketId);
+                axios({
+                    method: 'get',
+                    url: '/order/manager/' + row.id,
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.orderForm = res.data.data;
+                    } else if (res.data.code === 300) {
+                        this.$message.warning(res.data.msg);
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错了，请稍后再试");
+                    }
+                })
+                this.updateOrderDialog = true;
+            },
+            getTicketInfoInOrder(ticketId) {
+                axios({
+                    method: 'get',
+                    url: '/ticket/manager/' + ticketId,
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.updateOrderTicket = res.data.data;
+                        this.updateOrderTicket.tickets = res.data.data.tickets[0];
+                    } else if (res.data.code === 300) {
+                        this.$message.warning(res.data.msg);
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错了，请稍后再试");
+                    }
+                })
+            },
+            //新增方法
+            addCityInfo() {
+                this.$refs.addNewCity.validate((valid) => {
+                    if (valid) {
+                        this.voyageForm = {}
+                        axios({
+                            method: 'post',
+                            url: '/city/manager',
+                            data: this.cityForm,
+                        }).then(res => {
+                            if (res.data.code === 200) {
+                                this.$message.success("添加成功");
+                                this.addCityFormDialog = false;
+                            } else if (res.data.code === 300) {
+                                this.$message.warning(res.data.msg);
+                            } else if (res.data.code === 304) {
+                                this.$message.error(res.data.msg)
+                                this.$message.warning("3s后进行跳转")
+                                setTimeout(function () {
+                                    window.location = res.data.data;
+                                }, 3000)
+                            } else {
+                                this.$message.error("出错了，请稍后再试");
+                            }
+                        })
+                    }
+                })
+            },
+            addVoyage() {
+                this.$refs.addNewVoyage.validate((valid) => {
+                    if (valid) {
+                        const voyageForm = this.voyageForm;
+                        let dateStartScheduled = new Date(voyageForm.startTime.scheduled);
+                        let dateArriveScheduled = new Date(voyageForm.arriveTime.scheduled);
+                        if (dateArriveScheduled <= dateStartScheduled) {
+                            this.$message.warning("起飞时间不得晚于降落时间")
+                            return;
+                        }
+                        axios({
+                            method: 'post',
+                            url: '/router/manager',
+                            data: {
+                                aircraftCode: voyageForm.aircraftCode,
+                                arriveAirportCode: voyageForm.arriveAirportCode[1],
+                                arriveTime: voyageForm.arriveTime,
+                                startAirportCode: voyageForm.startAirportCode[1],
+                                startTime: voyageForm.startTime,
+                            },
+                        }).then(res => {
+                            if (res.data.code === 200) {
+                                this.$message.success("添加成功");
+                                this.addVoyageFormDialog = false;
+                            } else if (res.data.code === 300) {
+                                this.$message.warning(res.data.msg);
+                            } else if (res.data.code === 304) {
+                                this.$message.error(res.data.msg)
+                                this.$message.warning("3s后进行跳转")
+                                setTimeout(function () {
+                                    window.location = res.data.data;
+                                }, 3000)
+                            } else {
+                                this.$message.error("出错了，请稍后再试");
+                            }
+                        })
+                    }
+                })
+            },
+            addTicket() {
+                this.$refs.addNewTicket.validate((valid) => {
+                    if (valid) {
+                        axios({
+                            method: 'post',
+                            url: '/ticket/manager',
+                            data: this.ticketForm,
+                        }).then(res => {
+                            if (res.data.code === 200) {
+                                this.$message.success("添加成功");
+                                this.addTicketDialog = false;
+                            } else if (res.data.code === 304) {
+                                this.$message.error(res.data.msg)
+                                this.$message.warning("3s后进行跳转")
+                                setTimeout(function () {
+                                    window.location = res.data.data;
+                                }, 3000)
+                            } else if (res.data.code === 300) {
+                                this.$message.warning(res.data.msg);
+                            }
+                        })
+                    }
+                })
+            },
+            // 更新数据
+            updateCity() {
+                this.$refs.updateCity.validate((valid) => {
+                    if (valid) {
+                        axios({
+                            method: 'put',
+                            url: '/city/manager',
+                            data: this.cityForm,
+                        }).then(res => {
+                            if (res.data.code === 200) {
+                                this.$message.success("修改成功");
+                                this.updateCityFormDialog = false;
+                            } else if (res.data.code === 300) {
+                                this.$message.warning(res.data.msg);
+                            } else if (res.data.code === 304) {
+                                this.$message.error(res.data.msg)
+                                this.$message.warning("3s后进行跳转")
+                                setTimeout(function () {
+                                    window.location = res.data.data;
+                                }, 3000)
+                            } else {
+                                this.$message.error("出错了，请稍后再试");
+                            }
+                        })
+                    }
+                })
+            },
+            updateVoyage() {
+                this.$refs.updateVoyage.validate(valid => {
+                    if (valid) {
+                        const voyageForm = this.voyageForm;
+                        let dateStartScheduled = new Date(voyageForm.startTime.scheduled);
+                        let dateStartEstimated = new Date(voyageForm.startTime.estimated);
+                        let dateArriveScheduled = new Date(voyageForm.arriveTime.scheduled);
+                        let dateArriveEstimated = new Date(voyageForm.arriveTime.estimated);
+                        if (dateArriveScheduled <= dateStartScheduled || dateArriveEstimated <= dateStartEstimated) {
+                            this.$message.warning("起飞时间不得晚于降落时间")
+                            return;
+                        }
+                        axios({
+                            method: 'put',
+                            url: '/router/manager',
+                            data: {
+                                aircraftCode: voyageForm.aircraftCode,
+                                arriveAirportCode: voyageForm.arriveAirportCode[1],
+                                arriveCity: voyageForm.arriveCity,
+                                arriveTime: voyageForm.arriveTime,
+                                arriveTimeId: voyageForm.arriveTimeId,
+                                id: voyageForm.id,
+                                routeCode: voyageForm.routeCode,
+                                startAirportCode: voyageForm.startAirportCode[1],
+                                startCity: voyageForm.startCity,
+                                startTime: voyageForm.startTime,
+                                startTimeId: voyageForm.startTimeId,
+                                status: voyageForm.status,
+                            },
+                        }).then(res => {
+                            if (res.data.code === 200) {
+                                this.$message.success("修改成功");
+                                this.updateVoyageDialog = false;
+                            } else if (res.data.code === 300) {
+                                this.$message.warning(res.data.msg);
+                            } else if (res.data.code === 304) {
+                                this.$message.error(res.data.msg)
+                                this.$message.warning("3s后进行跳转")
+                                setTimeout(function () {
+                                    window.location = res.data.data;
+                                }, 3000)
+                            } else {
+                                this.$message.error("出错了，请稍后再试");
+                            }
+                        })
+                    }
+                })
+            },
+            updateTicket() {
+                this.$refs.updateTicket.validate(valid => {
+                    if (valid) {
+                        axios({
+                            method: 'put',
+                            url: '/ticket/manager',
+                            data: this.ticketForm,
+                        }).then(res => {
+                            if (res.data.code === 200) {
+                                this.$message.success("修改成功");
+                                this.updateTicketDialog = false;
+                            } else if (res.data.code === 300) {
+                                this.$message.warning(res.data.msg);
+                            } else if (res.data.code === 304) {
+                                this.$message.error(res.data.msg)
+                                this.$message.warning("3s后进行跳转")
+                                setTimeout(function () {
+                                    window.location = res.data.data;
+                                }, 3000)
+                            } else {
+                                this.$message.error("出错了，请稍后再试");
+                            }
+                        })
+                    }
+                })
+            },
+            updateOrder() {
+                this.$refs.updateOrder.validate(valid => {
+                    if (valid) {
+                        axios({
+                            method: 'put',
+                            url: '/order/manager',
+                            data: this.orderForm,
+                        }).then(res => {
+                            if (res.data.code === 200) {
+                                this.$message.success("修改成功");
+                                this.orderFormSubmit();
+                                this.updateOrderDialog = false;
+                            } else if (res.data.code === 300) {
+                                this.$message.warning(res.data.msg);
+                            } else if (res.data.code === 304) {
+                                this.$message.error(res.data.msg)
+                                this.$message.warning("3s后进行跳转")
+                                setTimeout(function () {
+                                    window.location = res.data.data;
+                                }, 3000)
+                            } else {
+                                this.$message.error("出错了，请稍后再试");
+                            }
+                        })
+                    }
+                })
+            },
+            // 删除数据
+            deleteCity(row) {
+                this.$confirm('此操作将永久删除城市, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        method: 'delete',
+                        url: '/city/manager/' + row.id,
+                    }).then(res => {
+                        if (res.data.code === 200) {
+                            this.$message.success("删除成功");
+                            this.cityManagerSubmit();
+                        } else if (res.data.code === 304) {
+                            this.$message.error(res.data.msg)
+                            this.$message.warning("3s后进行跳转")
+                            setTimeout(function () {
+                                window.location = res.data.data;
+                            }, 3000)
+                        } else {
+                            this.$message.error("出错了，请稍后再试");
+                        }
+                    })
+                }).catch(() => {
+                    this.$message.info("取消删除");
+                })
+            }
+            ,
+            deleteVoyage(row) {
+                this.$confirm('此操作将永久删除航线, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        method: 'delete',
+                        url: '/router/manager/' + row.id,
+                    }).then(res => {
+                        if (res.data.code === 200) {
+                            this.$message.success("删除成功");
+                            this.voyageFormSubmit();
+                        } else if (res.data.code === 304) {
+                            this.$message.error(res.data.msg)
+                            this.$message.warning("3s后进行跳转")
+                            setTimeout(function () {
+                                window.location = res.data.data;
+                            }, 3000)
+                        } else {
+                            this.$message.error("出错了，请稍后再试");
+                        }
+                    })
+                }).catch(() => {
+                    this.$message.info("取消删除");
+                })
+            }
+            ,
+            deleteTicket(row) {
+                this.$confirm('此操作将永久删除机票, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        method: 'delete',
+                        url: '/ticket/manager/' + row.id,
+                    }).then(res => {
+                        if (res.data.code === 200) {
+                            this.$message.success("删除成功");
+                            this.ticketFormSubmit();
+                        } else if (res.data.code === 304) {
+                            this.$message.error(res.data.msg)
+                            this.$message.warning("3s后进行跳转")
+                            setTimeout(function () {
+                                window.location = res.data.data;
+                            }, 3000)
+                        } else {
+                            this.$message.error("出错了，请稍后再试");
+                        }
+                    })
+                }).catch(() => {
+                    this.$message.info("取消删除");
+                })
+            }
+            ,
+            deleteOrder(row) {
+                this.$confirm('此操作将永久删除订单, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        method: 'delete',
+                        url: '/order/manager/' + row.id,
+                    }).then(res => {
+                        if (res.data.code === 200) {
+                            this.$message.success("删除成功");
+                            this.orderFormSubmit();
+                        } else if (res.data.code === 304) {
+                            this.$message.error(res.data.msg)
+                            this.$message.warning("3s后进行跳转")
+                            setTimeout(function () {
+                                window.location = res.data.data;
+                            }, 3000)
+                        } else {
+                            this.$message.error("出错了，请稍后再试");
+                        }
+                    })
+                }).catch(() => {
+                    this.$message.info("取消删除");
+                })
+            }
+            ,
+            //表格颜色
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex % 2 === 1) {
+                    return 'success-row';
+                }
+                return '';
+            }
+            ,
+            rowStyle() {
+                return "text-align:center";
+            }
+            ,
+            clearCityForm() {
+                this.cityForm = {
+                    airportEnglishName: '',
+                    airportPyName: '',
+                    cityEnglishName: '',
+                    cityPyName: '',
+                    cnName: '',
+                    code: '',
+                    iataApCode: '',
+                };
+            }
+            ,
+            clearVoyageForm() {
+                this.voyageForm = {
+                    aircraftCode: '',
+                    arriveAirportCode: [],
+                    arriveTime: {
+                        scheduled: '',
+                        estimated: '',
+                    },
+                    routeCode: '',
+                    startAirportCode: [],
+                    startTime: {
+                        scheduled: '',
+                        estimated: '',
+                    },
+                    status: '',
+                };
+            }
+            ,
+            clearTicketForm() {
+                this.ticketForm = {
+                    num: '',
+                    price: '',
+                    type: '',
+                    routeId: '',
+                };
+            }
+            ,
+        },
+        data() {
+            return {
+                //机票管理
+                ticketManagerForm: {
+                    value: [],
+                    valueArrive: [],
+                    value1: '',
+                },
+                ticketManagerData: [],
+                addTicketDialog: false,
+                updateTicketDialog: false,
+                ticketForm: {
+                    num: '',
+                    price: '',
+                    type: '',
+                    routeId: '',
+                },
+                ticketFormRules: {
+                    num: [
+                        {required: true, message: '请输入机票数量', trigger: 'blur'}
+                    ],
+                    price: [
+                        {required: true, message: '请输入机票价格', trigger: 'blur'}
+                    ],
+                    type: [
+                        {required: true, message: '请输入机票类型', trigger: 'blur'}
+                    ],
+                },
+                addTicketDialogRouterInfo: {
+                    aircraftCode: '',
+                    startCity: {
+                        pyName: '',
+                    },
+                    arriveCity: {
+                        pyName: '',
+                    },
+                    routeCode: '',
+                    startTime: {
+                        estimated: '',
+                        scheduled: '',
+                    },
+                    arriveTime: {
+                        estimated: '',
+                        scheduled: '',
+                    }
+                },
+                // 订单表单
+                //订单管理数据
+                orderManagerData: [],
+                orderManagerForm: {
+                    name: '',
+                    idNumber: '',
+                    tel: '',
+                    mail: '',
+                    ticketId: '',
+                },
+                updateOrderTicket: {
+                    aircraftCode: '',
+                    startCity: {
+                        pyName: '',
+                    },
+                    arriveCity: {
+                        pyName: '',
+                    },
+                    routeCode: '',
+                    startTime: {
+                        estimated: '',
+                        scheduled: '',
+                    },
+                    arriveTime: {
+                        estimated: '',
+                        scheduled: '',
+                    },
+                    tickets: [],
+                },
+                orderFormRules: {
+                    name: [
+                        {type: 'array', required: true, message: '请输入出发城市', trigger: 'blur'},
+                    ],
+                    idNumber: [
+                        {type: 'array', required: true, message: '请输入出发城市', trigger: 'blur'},
+                    ],
+                    tel: [
+                        {type: 'array', required: true, message: '请输入出发城市', trigger: 'blur'},
+                    ],
+                    mail: [
+                        {type: 'array', required: true, message: '请输入出发城市', trigger: 'blur'},
+                    ],
+                    ticketId: [
+                        {type: 'array', required: true, message: '请输入出发城市', trigger: 'blur'},
+                    ],
+                    status: [
+                        {type: 'array', required: true, message: '请输入出发城市', trigger: 'blur'},
+                    ]
+                },
+                orderForm: {
+                    name: '',
+                    tel: '',
+                    idNumber: '',
+
+                },
+                orderStatusOptions: [{
+                    value: '1',
+                    label: '已订票'
+                }, {
+                    value: '2',
+                    label: '已取消'
+                }, {
+                    value: '3',
+                    label: '已检票'
+                }, {
+                    value: '4',
+                    label: '已值机'
+                }, {
+                    value: '5',
+                    label: '已改签'
+                }],
+                updateOrderDialog: false,
+                updateOrderTicketInfo: {
+                    aircraftCode: '',
+                    startCity: {
+                        pyName: '',
+                    },
+                    arriveCity: {
+                        pyName: '',
+                    },
+                    routeCode: '',
+                    startTime: {
+                        estimated: '',
+                        scheduled: '',
+                    },
+                    arriveTime: {
+                        estimated: '',
+                        scheduled: '',
+                    }
+                },
+                //航线查询表单
+                voyageManagerForm: {
+                    value: [],
+                    valueArrive: [],
+                    value1: '',
+                },
+                voyageManagerTable: [],
+                //航程新增、更新数据
+                voyageForm: {
+                    aircraftCode: '',
+                    arriveAirportCode: [],
+                    arriveTime: {
+                        scheduled: '',
+                        estimated: '',
+                    },
+                    routeCode: '',
+                    startAirportCode: [],
+                    startTime: {
+                        scheduled: '',
+                        estimated: '',
+                    },
+                    status: '',
+                },
+                voyageFormRules: {
+                    startAirportCode: [
+                        {type: 'array', required: true, message: '请输入出发城市', trigger: 'blur'},
+                    ],
+                    arriveAirportCode: [
+                        {type: 'array', required: true, message: '请输入到达城市', trigger: 'blur'},
+                    ],
+                    startTime: {
+                        scheduled: [
+                            {required: true, message: '请输入预定出发时间', trigger: 'blur'},
+                        ],
+                    },
+                    arriveTime: {
+                        scheduled: [
+                            {required: true, message: '请输入预定到达时间', trigger: 'blur'},
+                        ],
+                    },
+                    startEstimated: [
+                        {required: true, message: '请输入实际出发时间', trigger: 'blur'},
+                    ],
+                    arriveEstimated: [
+                        {required: true, message: '请输入实际到达时间', trigger: 'blur'},
+                    ],
+                    aircraftCode: [
+                        {required: true, message: '请输入飞机编号', trigger: 'blur'},
+                    ],
+                    status: [
+                        {required: true, message: '请选择航班状态', trigger: 'blur'},
+                    ],
+                },
+                addVoyageFormDialog: false,
+                updateVoyageDialog: false,
+                voyageStatus: [{
+                    value: '计划中',
+                    label: '计划中'
+                }, {
+                    value: '飞行中',
+                    label: '飞行中'
+                }, {
+                    value: '已取消',
+                    label: '已取消'
+                }, {
+                    value: '已降落',
+                    label: '已降落'
+                }],
+                //城市管理表单
+                cityManagerForm: {
+                    cityPyName: '',
+                    cnName: ''
+                },
+                //城市信息表单
+                cityForm: {
+                    airportEnglishName: '',
+                    airportPyName: '',
+                    cityEnglishName: '',
+                    cityPyName: '',
+                    cnName: '',
+                    code: '',
+                    iataApCode: '',
+                },
+                addCityFormDialog: false,
+                updateCityFormDialog: false,
+                //城市表单规则
+                cityFormRules: {
+                    airportEnglishName: [
+                        {required: true, message: '请输入机场英文名', trigger: 'blur'},
+                    ],
+                    airportPyName: [
+                        {required: true, message: '请输入机场中文拼音', trigger: 'blur'},
+                    ],
+                    cityEnglishName: [
+                        {required: true, message: '请输入城市英文名', trigger: 'blur'},
+                    ],
+                    cityPyName: [
+                        {required: true, message: '请输入城市中文名', trigger: 'blur'},
+                    ],
+                    cnName: [
+                        {required: true, message: '请输入机场中文名', trigger: 'blur'},
+                    ],
+                    code: [
+                        {required: true, message: '请输入机场编号', trigger: 'blur'},
+                    ],
+                    iataApCode: [
+                        {required: true, message: '请输入国际航协编号', trigger: 'blur'},
+                    ],
+                },
+                cityManagerTable: [],
+                //城市数据
+                options: [],
+                showPage: 0,
+                //分页
+                currentPage: 1,
+                pageSize: 5,
+                total: 0,
+                //    对话框表单style
+                formLabelWidth: '120px'
+            }
+        }
+        ,
+    })
+</script>
+</body>
+</html>

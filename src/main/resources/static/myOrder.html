@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>闽江航空</title>
+    <link rel="stylesheet" href="css/head.css">
+    <link rel="shortcut icon" href="img/img.png" type="image/x-icon"/>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.7.14/vue.js"></script>
+    <!-- 引入样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css" rel="stylesheet">
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/index.min.js"></script>
+    <link href="css/footer.css" rel="stylesheet">
+    <style>
+        #order {
+            background: rgba(28, 105, 101, 0.44);
+            margin-top: 0;
+            height: 2.27vw;
+            width: 10.41vw;
+            padding-top: 1vw;
+        }
+
+        #main {
+            width: 60%;
+            margin: 0 auto;
+            padding-top: 4.55vw;
+        }
+
+        #main .order_list_item {
+            padding: 0.65vw;
+            margin-bottom: 0.65vw;
+            border: solid 1px #d9d8d8;
+        }
+
+        #main .order_list_item .order_title {
+            width: 100%;
+            border-left: solid 2px #27749b;
+            height: 2.67vw;
+            margin-bottom: 0.13vw;
+        }
+
+        #main .order_list_item .order_title .order_no {
+            position: relative;
+            padding-top: 0.65vw;
+            padding-bottom: 0.65vw;
+            padding-left: 1.95vw;
+            float: left;
+            font-size: 0.65vw;
+            color: gray;
+        }
+
+        #main .order_list_item .order_title .el-button--text {
+            padding: 0;
+            color: gray;
+        }
+
+        #main .order_list_item .order_title .order_price {
+            padding-right: 1.95vw;
+            float: right;
+            color: orange;
+            font-size: 1.17vw;
+        }
+
+        #main .order_list_item .order_title p {
+            font-size: 0.65vw;
+            color: gray;
+            display: inline;
+        }
+
+        .el-descriptions-item__cell .el-button--primary {
+            padding: 0 1.3vw;
+            height: 1.82vw;
+        }
+
+        #main .empty {
+            width: 59vw;
+            height: 13vw;
+        }
+
+        #main .no-info {
+            padding-top: 6.5vw;
+            height: 13vw;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 3.25vw;
+            color: #3fc3fc;
+            font-family: 幼圆, serif;
+        }
+
+        .get-flight-information {
+            padding-top: 0.65vw;
+            text-align: center;
+        }
+
+        .get-flight-information .el-icon-sort {
+            width: 3.25vw;
+            height: 1.95vw;
+            -moz-transform: rotate(-90deg);
+            -webkit-transform: rotate(-90deg);
+        }
+
+        .information {
+            width: 60%;
+            margin: 0 auto;
+        }
+
+        .information .flight-no {
+            background-color: #86aae0;
+            height: 2.6vw;
+        }
+
+        .information .flight-no img {
+            float: left;
+            margin-left: 0.65vw;
+            width: 2.6vw;
+        }
+
+        .information .flight-no p {
+            padding-top: 0.65vw;
+            padding-left: 2.6vw;
+        }
+
+        .information .time-price {
+            height: 5.2vw;
+            background-color: #e2ebff;
+        }
+
+        .information .time-price .start {
+            padding-top: 0.65vw;
+            text-align: center;
+            float: left;
+            padding-left: 0.65vw;
+        }
+
+        .information .time-price .start .time {
+            font-size: 1.95vw;
+        }
+
+        .information .time-price .start .plane {
+            font-size: 0.65vw;
+            color: gray;
+        }
+
+        .information .time-price .arrive {
+            padding-top: 0.97vw;
+            text-align: center;
+            float: left;
+            padding-left: 5.2vw;
+            padding-right: 5.2vw;
+        }
+
+        .information .time-price .end {
+            padding-top: 0.65vw;
+            text-align: center;
+            float: left;
+        }
+
+        .information .time-price .end .time {
+            font-size: 1.95vw;
+        }
+
+        .information .time-price .end .plane {
+            font-size: 0.65vw;
+            color: gray;
+        }
+
+        .information .time-price .arrive {
+            border-bottom: 1px dashed gray;
+        }
+
+        .information .time-price .arrive .total-time {
+            font-size: 0.65vw;
+            color: gray;
+        }
+
+        .information .time-price .price {
+            float: right;
+            padding-top: 1.3vw;
+            padding-right: 1.3vw;
+            color: #FF8214;
+            font-size: 1.95vw;
+        }
+
+        .information .time-price .price p {
+            display: inline;
+            font-size: 0.97vw;
+        }
+
+        .information .price-list {
+            font-size: 0.65vw;
+            margin-left: 3.25vw;
+            height: 3.9vw;
+            border-bottom: 1px solid #cecece;
+            color: gray;
+            margin-right: 3.25vw;
+        }
+
+        .information .price-list .price-type {
+            padding-top: 1.3vw;
+            float: left;
+        }
+
+        .information .price-list .type {
+            margin-top: 1.3vw;
+            padding-right: 3.25vw;
+            color: black;
+        }
+
+        .information .price-list .price {
+            font-size: 1.3vw;
+            color: #FF8214;
+        }
+
+        .information .price-list .chose {
+            font-size: 0.32vw;
+            margin-top: 0.65vw;
+            margin-right: 1.3vw;
+            float: right;
+        }
+
+        .el-dialog {
+            width: 80%;
+        }
+
+        /*确认信息*/
+        #main .order-information .ticket-info {
+            width: 60%;
+            margin: 0 auto;
+        }
+
+        #main .order-information .ticket-info .title-text {
+            margin: 0.65vw auto 0;
+            background-color: #2f71bd;;
+            height: 3.25vw;
+            color: white;
+        }
+
+        #main .order-information .ticket-info .ticket-desc {
+            padding-top: 0.65vw;
+            padding-bottom: 0.65vw;
+            border: 1px solid gainsboro;
+        }
+
+        #main .order-information .ticket-info p {
+            line-height: 3.25vw;
+            padding-left: 1.30vw;
+            font-size: 1.62vw;
+        }
+
+        #main .order-information .ticket-info .margin-top {
+            width: 99%;
+            margin: 0 auto;
+        }
+
+        #main .order-information .price {
+            width: 60%;
+            margin: 0 auto;
+            height: 3.25vw;
+            background-image: linear-gradient(to right, orange, #ff7300);
+        }
+
+        #main .order-information .price p {
+            float: left;
+            margin-left: 0.65vw;
+            line-height: 3.25vw;
+            font-size: 1.62vw;
+            color: white;
+        }
+
+        .order-information .el-descriptions-item__cell {
+            font-size: 0.5vw;
+        }
+
+        #main .order-information .price .num {
+            float: right;
+            margin-right: 0.65vw;
+        }
+
+        #main .order-information .button {
+            width: 60%;
+            margin: 0.65vw auto;
+        }
+
+        #main .order-information .button .pre-step {
+            border: 0;
+            margin-left: 1.3vw;
+            margin-bottom: 1.3vw;
+            background-image: linear-gradient(to right, #3fc3fc, #409EFF);
+        }
+
+        #main .order-information .button .next-step {
+            border: 0;
+            float: right;
+            margin-right: 1.3vw;
+            margin-bottom: 1.3vw;
+            background-image: linear-gradient(to right, orange, #ff7300);
+        }
+
+        #main .finish {
+            text-align: center;
+            width: 60%;
+            margin: 6.51vw auto;
+        }
+
+        #main .finish .text {
+            font-size: 6.51vw;
+            font-family: "楷体", serif;
+            background-image: -webkit-linear-gradient(top, #3fc3fc, #409EFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #main .finish .button .pre-step, #main .finish .button .next-step {
+            margin: 1.30vw 6.51vw;
+        }
+    </style>
+    <script src="https://cdn.bootcdn.net/ajax/libs/boxicons/2.1.4/dist/boxicons.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/boxicons/2.1.4/css/boxicons.css" rel="stylesheet">
+</head>
+<body>
+<div id="app">
+    <header id="header">
+        <img src="img/img.png" alt="小图标" id="airplane_icon">
+        <a v-if="isLogin===true" href="personInfo.html" id="is-login">
+            <el-avatar :size="'large'" :src="'resources/'+userinfo.logo"></el-avatar>
+        </a>
+        <a v-if="isLogin===false" href="login.html" id="login"><p>登录|注册</p></a>
+        <a href="myOrder.html" id="order"><p>我的订单</p></a>
+        <a href="scheduled.html" id="scheduled"><p>机票预定</p></a>
+        <a href="information.html" id="information"><p>航班信息</p></a>
+        <a href="index.html" id="main_page"><p>首页</p></a>
+        <h1 id="head_text">闽江航空</h1>
+    </header>
+    <article id="main">
+        <div class="order_list_item" v-for="orderInfo in orderInfos">
+            <div class="order_title">
+                <div class="order_no">
+                    <el-button type="text">订单编号：{{orderInfo.orderNo}}</el-button>
+                </div>
+                <div class="order_price">
+                    <p>价格￥</p>{{orderInfo.price}}<p>元</p>
+                </div>
+            </div>
+            <div class="order-item">
+                <el-descriptions class="margin-top" :column="3" border>
+                    <el-descriptions-item>
+                        <template slot="label">
+                            <i class='bx bxs-plane'></i>
+                            航班号
+                        </template>
+                        {{orderInfo.flightNo}}
+                    </el-descriptions-item>
+                    <el-descriptions-item>
+                        <template slot="label">
+                            <i class='bx bxs-plane-take-off'></i>
+                            出发地
+                        </template>
+                        {{orderInfo.startCity}}
+                    </el-descriptions-item>
+                    <el-descriptions-item>
+                        <template slot="label">
+                            <i class='bx bxs-plane-land'></i>
+                            到达地
+                        </template>
+                        {{orderInfo.arriveCity}}
+                    </el-descriptions-item>
+                    <el-descriptions-item>
+                        <template slot="label">
+                            <i class='bx bxs-user'></i>
+                            乘客
+                        </template>
+                        {{orderInfo.name}}
+                    </el-descriptions-item>
+                    <el-descriptions-item>
+                        <template slot="label">
+                            <i class='bx bx-bar-chart-alt'></i>
+                            状态
+                        </template>
+                        {{orderInfo.status === 1 ? '已订票' : orderInfo.status === 2 ?
+                            '已取消' : orderInfo.status === 3 ? '已检票' : orderInfo.status === 4 ?
+                                    '已值机' : orderInfo.status === 5 ? '已改签' : orderInfo.status}}
+                    </el-descriptions-item>
+                    <el-descriptions-item>
+                        <template slot="label">
+                            <i class='bx bx-cog'></i>
+                            操作
+                        </template>
+                        <el-dropdown @command="handleCommand">
+                            <el-button type="primary" round class="option">操作</el-button>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item :command="beforeCommand('退票',orderInfo.num)">退票</el-dropdown-item>
+                                <el-dropdown-item :command="beforeCommand('改签',orderInfo.num)">改签</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                    </el-descriptions-item>
+                </el-descriptions>
+            </div>
+        </div>
+        <div id="change-dialog">
+            <el-dialog title="改签" :visible.sync="dialogFormVisible">
+                <div id="step">
+                    <el-steps :active="active" finish-status="success">
+                        <el-step title="步骤 1"></el-step>
+                        <el-step title="步骤 2"></el-step>
+                        <el-step title="步骤 3"></el-step>
+                    </el-steps>
+                </div>
+                <div id="ticket">
+                    <div v-if="active===0">
+                        <div id="form">
+                            <el-form :model="form">
+                                <el-form :inline="true" class="demo-form-inline">
+                                    <el-form-item>
+                                        <el-cascader
+                                                ref="cascaderAddr"
+                                                placeholder="出发城市"
+                                                v-model="form.start"
+                                                :options="options"
+                                                :show-all-levels="false"
+                                                disabled>
+                                        </el-cascader>
+                                    </el-form-item>
+                                    <i class="el-icon-sort" style=""></i>
+                                    <el-form-item>
+                                        <el-cascader
+                                                ref="cascaderAddr2"
+                                                placeholder="到达城市"
+                                                v-model="form.arrive"
+                                                :options="options"
+                                                :show-all-levels="false">
+                                        </el-cascader>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-date-picker
+                                                v-model="form.date"
+                                                type="date"
+                                                value-format="yyyy-MM-dd"
+                                                placeholder="选择日期"
+                                                :picker-options="pickerOptions">
+                                        </el-date-picker>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-button type="primary" @click="getInfo" round>查询</el-button>
+                                    </el-form-item>
+                                </el-form>
+                            </el-form>
+                        </div>
+                        <div class="empty" v-if="showInfo === 0" v-loading="loadingInfo"></div>
+
+                        <div class="no-info" v-if="showInfo === 1" v-loading="loadingInfo">
+                            <i class="el-icon-warning-outline"></i>
+                            没有路线信息
+                        </div>
+
+                        <div class="has-info" v-if="showInfo === 2">
+                            <div class="information" v-loading="loadingInfo"
+                                 v-for="flightInformation in flightInformationS">
+                                <div class="flight-no">
+                                    <img src="img/img.png" alt="null">
+                                    <p>{{flightInformation.no}}</p>
+                                </div>
+                                <div class="time-price">
+                                    <div class="time-info">
+                                        <div class="start">
+                                            <div class="time">{{flightInformation.startTime}}</div>
+                                            <div class="plane">{{flightInformation.startAirport}}</div>
+                                        </div>
+                                        <div class="arrive">
+                                            <div class="total-time">{{flightInformation.arriveTime}}</div>
+                                        </div>
+                                        <div class="end">
+                                            <div class="time">{{flightInformation.endTime}}</div>
+                                            <div class="plane">{{flightInformation.endAirport}}</div>
+                                        </div>
+                                    </div>
+                                    <div class="price">
+                                        <p>￥</p>{{flightInformation.minPrice}}<p>起</p>
+                                        <el-button @click="addPriceBox(flightInformation.num)" type="text"
+                                                   class="expend"
+                                                   v-if="priceBoxShow.indexOf(flightInformation.num)===-1">展开
+                                        </el-button>
+                                        <el-button @click="delPriceBox(flightInformation.num)" type="text"
+                                                   class="collapse"
+                                                   v-if="priceBoxShow.indexOf(flightInformation.num)!==-1">收起
+                                        </el-button>
+                                    </div>
+                                </div>
+                                <el-collapse-transition>
+                                    <div v-if="priceBoxShow.indexOf(flightInformation.num)!==-1">
+                                        <div class="price-list" v-for="price in flightInformation.prices">
+                                            <div v-if="price.num!==0">
+                                                <div class="price-type">
+                                                    <span class="type">{{price.type}}</span>
+                                                    ￥<span class="price">{{price.price}}</span>起
+                                                </div>
+                                                <el-button class="chose" type="primary"
+                                                           @click="scheduledTicket(flightInformation,price)"
+                                                           round>预定
+                                                </el-button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </el-collapse-transition>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="order-information" v-if="active===1" v-loading="loadingInfo">
+                        <div class="ticket-info">
+                            <div class="title-text">
+                                <p>机票信息</p>
+                            </div>
+                            <div class="ticket-desc">
+                                <el-descriptions class="margin-top" :column="3" border>
+                                    <el-descriptions-item>
+                                        <template slot="label">
+                                            航班号
+                                        </template>
+                                        {{OrderTicketInfo.flightNo}}
+                                    </el-descriptions-item>
+                                    <el-descriptions-item>
+                                        <template slot="label">
+                                            座舱
+                                        </template>
+                                        {{OrderTicketInfo.type}}
+                                    </el-descriptions-item>
+                                    <el-descriptions-item>
+                                        <template slot="label">
+                                            路线
+                                        </template>
+                                        {{OrderTicketInfo.startAirport}}——>{{OrderTicketInfo.endAirport}}
+                                    </el-descriptions-item>
+                                    <el-descriptions-item>
+                                        <template slot="label">
+                                            姓名
+                                        </template>
+                                        {{OrderTicketInfo.name}}
+                                    </el-descriptions-item>
+                                    <el-descriptions-item>
+                                        <template slot="label">
+                                            证件号
+                                        </template>
+                                        {{OrderTicketInfo.idNumber}}
+                                    </el-descriptions-item>
+                                    <el-descriptions-item>
+                                        <template slot="label">
+                                            电话
+                                        </template>
+                                        {{OrderTicketInfo.tel}}
+                                    </el-descriptions-item>
+                                </el-descriptions>
+                            </div>
+                        </div>
+                        <div class="price">
+                            <p>价格：</p>
+                            <p class="num">{{OrderTicketInfo.price}}</p>
+                        </div>
+                        <div class="button">
+                            <el-button type="primary" @click="changePage" round class="pre-step">重新选择机票</el-button>
+                            <el-button type="primary" @click="PayTicket" round class="next-step">下一步</el-button>
+                        </div>
+                    </div>
+                    <div class="finish" v-if="active===2">
+                        <div class="text">改签完成</div>
+                        <div class="button">
+                            <el-button type="primary" @click="dialogFormVisible=false" round class="pre-step">关闭
+                            </el-button>
+                        </div>
+                    </div>
+                </div>
+            </el-dialog>
+        </div>
+    </article>
+    <footer id="footer">
+        <p>©2023 孙康平</p>
+    </footer>
+</div>
+<script src="js/axios-0.18.0.js"></script>
+<script src="js/vue-cookies.js"></script>
+<script>
+    new Vue({
+        el: "#app",
+        mounted: function () {
+            this.getUserInfo();
+            this.getPersonOrder();
+            this.getCityInfo();
+        },
+        watch: {
+            'dialogFormVisible': function () {
+                if (this.dialogFormVisible === false) {
+                    this.form = {
+                        ticketInfo: '',
+                        routeInfo: '',
+                        start: '',
+                        arrive: '',
+                        date: ''
+                    }
+                    this.flightInformationS = [];
+                    this.getPersonOrder();
+                }
+            }
+        },
+        methods: {
+            //支付
+            PayTicket() {
+                axios({
+                    url: "/ticket",
+                    method: 'put',
+                    data: this.change,
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.active = 2;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错了，请稍后再试");
+                    }
+                })
+            },
+            //重新选择机票
+            changePage() {
+                this.active = 0;
+            },
+            //预定
+            scheduledTicket(flightInformation, price) {
+                let startTime = flightInformation.startTime;
+                startTime = this.value1 + "T" + startTime;
+                let date = new Date(startTime);
+                let date1 = new Date();
+                let number = date - date1;
+                console.log(number);
+                if (number <= 4 * 60 * 60 * 1000) {
+                    this.$message.warning('不允许预定四小时内起飞的机票');
+                    return;
+                }
+                this.form.ticketInfo = price;
+                this.form.routeInfo = flightInformation;
+                this.change.ticketNo = price.id;
+                this.OrderTicketInfo = {
+                    flightNo: flightInformation.no,
+                    type: price.type,
+                    startAirport: flightInformation.startAirport,
+                    endAirport: flightInformation.endAirport,
+                    name: this.choseOrder.name,
+                    idNumber: this.choseOrder.idNumber,
+                    tel: this.choseOrder.tel,
+                    price: price.price,
+                }
+                this.active = 1;
+            },
+            //机票操作
+            handleCommand(command) {
+                if (command.option === "退票") {
+                    axios({
+                        url: '/ticket/' + this.orderInfos[command.num].orderNo,
+                        method: 'delete'
+                    }).then(res => {
+                        if (res.data.code === 200) {
+                            this.$message.success("退票成功");
+                        } else if (res.data.code === 304) {
+                            this.$message.error(res.data.msg)
+                            this.$message.warning("3s后进行跳转")
+                            setTimeout(function () {
+                                window.location = res.data.data;
+                            }, 3000)
+                        } else {
+                            this.$message.error("退票失败，请稍后再试");
+                        }
+                        this.getPersonOrder();
+                    })
+                }
+                if (command.option === "改签") {
+                    this.form.start = [this.orderInfos[command.num].startPyName[0], this.orderInfos[command.num].startIataCode];
+                    this.change.orderNo = this.orderInfos[command.num].orderNo
+                    this.choseOrder = this.orderInfos[command.num];
+                    this.dialogFormVisible = true;
+                }
+            },
+            beforeCommand(option, orderNo) {
+                return {
+                    'option': option,
+                    'num': orderNo,
+                }
+            },
+            //获取用户信息
+            getUserInfo() {
+                // this.isLogin=false;
+                let userid = this.$cookies.get('userid');
+                if (userid === null) return;
+                axios({
+                    method: 'get',
+                    url: '/user/' + userid,
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.userinfo = res.data.data;
+                        this.isLogin = true;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错啦，请稍后再试");
+                    }
+                })
+            },
+            //获取订单信息
+            getPersonOrder() {
+                axios({
+                    method: 'get',
+                    url: '/order'
+                }).then(res => {
+                    if (res.data.code === 300) {
+                        this.$message.warning(res.data.msg);
+                    } else if (res.data.code !== 200) {
+                        this.$message.error("出错了，请稍后再试");
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.orderInfos = res.data.data;
+                    }
+                });
+            },
+            getCityInfo() {
+                axios({
+                    method: 'get',
+                    url: '/city',
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.options = res.data.data;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错啦，请稍后再试");
+                    }
+                })
+            },
+            //展开机票信息
+            addPriceBox(index) {
+                this.priceBoxShow.push(index);
+            },
+            //收起机票信息
+            delPriceBox(index) {
+                this.priceBoxShow.splice(this.priceBoxShow.indexOf(index));
+            },
+
+            //查询机票信息
+            getInfo() {
+                if (this.form.start[1] === null || this.form.start.length === 0) {
+                    this.$message.warning("请选择出发城市");
+                    return
+                }
+                if (this.form.arrive[1] === null || this.form.arrive === 0) {
+                    this.$message.warning("请选择到达城市");
+                    return
+                }
+                if (this.form.date === null || this.form.date === "") {
+                    this.$message.warning("请选择时间");
+                    return
+                }
+                this.showInfo = 0;
+                this.loadingInfo = true;
+                this.priceBoxShow = [];
+                axios({
+                    method: 'post',
+                    url: '/ticket',
+                    data: {
+                        startCity: this.form.start[1],
+                        endCity: this.form.arrive[1],
+                        time: this.form.date.toString(),
+                    }
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.flightInformationS = res.data.data;
+                    } else if (res.data.code === 300) {
+                        this.$message.warning(res.data.msg);
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错啦，请稍后再试");
+                    }
+                    if (this.flightInformationS.length === 0)
+                        this.showInfo = 1;
+                    else
+                        this.showInfo = 2;
+                    this.loadingInfo = false;
+                })
+            },
+        },
+        data() {
+            return {
+                pickerOptions: {
+                    disabledDate(time) {
+                        let curDate = (new Date()).getTime();
+                        let three = 30 * 24 * 3600 * 1000;
+                        let threeMonths = curDate + three;
+                        return time.getTime() < Date.now() - 8.64e7 || time.getTime() > threeMonths;
+                    },
+                },
+                userinfo: {},
+                orderInfos: [{
+                    orderNo: "00001",
+                    price: 1000,
+                    name: "康康",
+                    flightNo: "00001",
+                    idNumber: '',
+                    tel: '',
+                    startCity: "福州",
+                    startPyName: "F",
+                    startIataCode: "FOC",
+                    arriveCity: "郑州",
+                    status: "已取消",
+                }],
+                isLogin: false,
+                dialogFormVisible: false,
+                change: {
+                    orderNo: '',
+                    ticketNo: '',
+                },
+                form: {
+                    ticketInfo: '',
+                    routeInfo: '',
+                    start: ["A", "AVA"],
+                    arrive: '',
+                    date: ''
+                },
+                choseOrder: '',
+                showInfo: 0,
+                options: [],
+                priceBoxShow: [],
+                flightInformationS: [],
+                loadingInfo: false,
+                active: 0,
+            }
+        }
+    })
+</script>
+</body>
+</html>

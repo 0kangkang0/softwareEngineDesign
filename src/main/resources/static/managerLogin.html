@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>闽江航空|后台管理</title>
+    <link rel="shortcut icon" href="img/img.png" type="image/x-icon"/>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.7.14/vue.js"></script>
+    <!-- 引入样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css" rel="stylesheet">
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/index.min.js"></script>
+    <style>
+        * {
+            margin: 0 0;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .header {
+            background-color: #38393f;
+            color: white;
+        }
+
+        .header .airplane_icon {
+            margin-top: 7px;
+            line-height: 50px;
+            margin-left: 50px;
+            float: left;
+            display: inline;
+            width: 50px;
+            height: 50px;
+        }
+
+        .header .head_text {
+            font-size: 40px;
+            font-family: "楷体", serif;
+            font-weight: bolder;
+            margin-top: 0;
+            margin-left: 110px;
+            line-height: 60px;
+            /*color: #fff;*/
+        }
+
+        .login-container {
+            width: 300px;
+            margin: 0 auto;
+            padding-top: 100px;
+        }
+
+        .login-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .login-form {
+            margin-top: 20px;
+        }
+
+        .login-container .el-form-item__content {
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        body {
+            background-color: rgba(93, 175, 176, 0.47);
+        }
+
+    </style>
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <el-header class="header">
+            <img src="img/img.png" alt="小图标" class="airplane_icon">
+            <h1 class="head_text">闽江航空</h1>
+        </el-header>
+        <el-main>
+            <template>
+                <div class="login-container">
+                    <el-form ref="loginForm" :model="loginData" class="login-form" :rules="loginRules">
+                        <h1 class="login-title">登录</h1>
+                        <el-form-item prop="username">
+                            <el-input v-model="loginData.username" placeholder="用户名"></el-input>
+                        </el-form-item>
+                        <el-form-item prop="password">
+                            <el-input type="password" v-model="loginData.password" placeholder="密码"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="login">登录</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+            </template>
+        </el-main>
+    </el-container>
+</div>
+<script src="js/hash.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+    new Vue({
+        el: "#app",
+        methods: {
+            login() {
+                this.$refs.loginForm.validate(valid => {
+                    if (valid) {
+                        const password = this.loginData.password;
+                        this.loginData.password = hex_md5(this.loginData.password);
+                        axios({
+                            method: 'post',
+                            url: '/manager',
+                            data: this.loginData
+                        }).then(res => {
+                            if (res.data.code === 300) {
+                                this.$message.warning(res.data.msg);
+                            } else if (res.data.code === 304) {
+                                this.$message.error(res.data.msg)
+                                this.$message.warning("3s后进行跳转")
+                                setTimeout(function () {
+                                    window.location = res.data.data;
+                                }, 3000)
+                            } else if (res.data.code === 302) {
+                                this.$message.success("登录成功，3s后跳转")
+                                setTimeout(function () {
+                                    window.location = res.data.msg;
+                                }, 3000);
+                            }
+                            this.loginData.password = password;
+                        })
+                    } else {
+                        // 表单验证不通过，给出提示或处理错误
+                        console.log('请输入有效的用户名和密码');
+                    }
+                });
+            }
+        },
+        data() {
+            return {
+                loginData: {
+                    username: '',
+                    password: ''
+                },
+                loginRules: {
+                    username: [
+                        {required: true, message: '请输入用户名', trigger: 'blur'}
+                    ],
+                    password: [
+                        {required: true, message: '请输入密码', trigger: 'blur'}
+                    ]
+                }
+            }
+        }
+    })
+</script>
+</body>
+</html>

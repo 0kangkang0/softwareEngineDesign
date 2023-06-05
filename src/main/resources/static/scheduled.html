@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ch">
+<head>
+    <meta charset="UTF-8">
+    <title>闽江航空</title>
+    <link rel="stylesheet" href="css/head.css">
+    <link rel="shortcut icon" href="img/img.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="css/orderFlight.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.7.14/vue.js"></script>
+    <!-- 引入样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css" rel="stylesheet">
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/index.min.js"></script>
+    <link href="css/footer.css" rel="stylesheet">
+    <style>
+        #main .active a:active {
+            color: white;
+        }
+
+        #scheduled {
+            background: rgba(28, 105, 101, 0.44);
+            margin-top: 0;
+            height: 2.3vw;
+            width: 10.41vw;
+            padding-top: 0.97vw;
+        }
+
+        .get-flight-information {
+            padding-top: 0.65vw;
+            text-align: center;
+        }
+
+        .get-flight-information .el-icon-sort {
+            width: 3.25vw;
+            height: 1.95vw;
+            -moz-transform: rotate(-90deg);
+            -webkit-transform: rotate(-90deg);
+        }
+
+        .information {
+            width: 60%;
+            margin: 0 auto;
+        }
+
+        .information .flight-no {
+            background-color: #86aae0;
+            height: 2.6vw;
+        }
+
+        .information .flight-no img {
+            float: left;
+            margin-left: 0.65vw;
+            width: 2.6vw;
+        }
+
+        .information .flight-no p {
+            padding-top: 0.65vw;
+            padding-left: 2.6vw;
+        }
+
+        .information .time-price {
+            height: 5.2vw;
+            background-color: #e2ebff;
+        }
+
+        .information .time-price .start {
+            padding-top: 0.65vw;
+            text-align: center;
+            float: left;
+            padding-left: 0.65vw;
+        }
+
+        .information .time-price .start .time {
+            font-size: 1.95vw;
+        }
+
+        .information .time-price .start .plane {
+            font-size: 0.65vw;
+            color: gray;
+        }
+
+        .information .time-price .arrive {
+            padding-top: 0.97vw;
+            text-align: center;
+            float: left;
+            padding-left: 5.2vw;
+            padding-right: 5.2vw;
+        }
+
+        .information .time-price .end {
+            padding-top: 0.65vw;
+            text-align: center;
+            float: left;
+        }
+
+        .information .time-price .end .time {
+            font-size: 1.95vw;
+        }
+
+        .information .time-price .end .plane {
+            font-size: 0.65vw;
+            color: gray;
+        }
+
+        .information .time-price .arrive {
+            border-bottom: 1px dashed gray;
+        }
+
+        .information .time-price .arrive .total-time {
+            font-size: 0.65vw;
+            color: gray;
+        }
+
+        .information .time-price .price {
+            float: right;
+            padding-top: 1.3vw;
+            padding-right: 1.3vw;
+            color: #FF8214;
+            font-size: 1.95vw;
+        }
+
+        .information .time-price .price p {
+            display: inline;
+            font-size: 0.97vw;
+        }
+
+        .information .price-list {
+            font-size: 0.65vw;
+            margin-left: 3.25vw;
+            height: 3.9vw;
+            border-bottom: 1px solid #cecece;
+            color: gray;
+            margin-right: 3.25vw;
+        }
+
+        .information .price-list .price-type {
+            padding-top: 1.3vw;
+            float: left;
+        }
+
+        .information .price-list .type {
+            margin-top: 1.3vw;
+            padding-right: 3.25vw;
+            color: black;
+        }
+
+        .information .price-list .price {
+            font-size: 1.3vw;
+            color: #FF8214;
+        }
+
+        .information .price-list .chose {
+            font-size: 0.32vw;
+            margin-top: 0.65vw;
+            margin-right: 1.3vw;
+            float: right;
+        }
+
+        #main .empty {
+            width: 100%;
+            height: 13vw;
+        }
+
+        #main .no-info {
+            padding-top: 6.5vw;
+            height: 13vw;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 3.25vw;
+            color: #3fc3fc;
+            font-family: 幼圆, serif;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <header id="header">
+        <img src="img/img.png" alt="小图标" id="airplane_icon">
+        <a v-if="isLogin===true" href="personInfo.html" id="is-login">
+            <el-avatar :size="'large'" :src="'resources/'+userinfo.logo"></el-avatar>
+        </a>
+        <a v-if="isLogin===false" href="login.html" id="login"><p>登录|注册</p></a>
+        <a href="myOrder.html" id="order"><p>我的订单</p></a>
+        <a href="#" id="scheduled"><p>机票预定</p></a>
+        <a href="information.html" id="information"><p>航班信息</p></a>
+        <a href="index.html" id="main_page"><p>首页</p></a>
+        <h1 id="head_text">闽江航空</h1>
+    </header>
+    <article id="main">
+        <div class="ticket_process">
+            <ul class="flight">
+                <li class="chose active">
+                    <div><a id="chose-box"><p>1.选择航班</p></a></div>
+                </li>
+                <li class="ordered">
+                    <div><a id="ordered-box"><p>2.填写订单</p></a></div>
+                </li>
+                <li class="pay">
+                    <div><a id="pay-box"><p>3.确认并支付</p></a></div>
+                </li>
+                <li class="end">
+                    <div><a id="end-box"><p>4.出票完成</p></a></div>
+                </li>
+            </ul>
+        </div>
+        <!--        查询表单-->
+        <div class="get-flight-information">
+            <el-form :inline="true" class="demo-form-inline">
+                <el-form-item>
+                    <el-cascader
+                            placeholder="出发城市"
+                            v-model="startCity"
+                            :options="options"
+                            :show-all-levels="false">
+                    </el-cascader>
+                </el-form-item>
+                <i class="el-icon-sort" style=""></i>
+                <el-form-item>
+                    <el-cascader
+                            placeholder="到达城市"
+                            v-model="arriveCity"
+                            :options="options"
+                            :show-all-levels="false">
+                    </el-cascader>
+                </el-form-item>
+                <el-form-item>
+                    <el-date-picker
+                            v-model="value1"
+                            type="date"
+                            value-format="yyyy-MM-dd"
+                            placeholder="选择日期"
+                            :picker-options="pickerOptions">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onSubmit()" round>查询</el-button>
+                </el-form-item>
+            </el-form>
+        </div>
+        <div class="empty" v-if="showInfo === 0" v-loading="loadingInfo">
+
+        </div>
+        <div class="no-info" v-if="showInfo === 1" v-loading="loadingInfo">
+            <i class="el-icon-warning-outline"></i>
+            没有路线信息
+        </div>
+        <div class="has-info" v-if="showInfo === 2">
+            <div class="information" v-loading="loadingInfo" v-for="flightInformation in flightInformationS">
+                <div class="flight-no">
+                    <img src="img/img.png" alt="null">
+                    <p>{{flightInformation.no}}</p>
+                </div>
+                <div class="time-price">
+                    <div class="time-info">
+                        <div class="start">
+                            <div class="time">{{flightInformation.startTime}}</div>
+                            <div class="plane">{{flightInformation.startAirport}}</div>
+                        </div>
+                        <div class="arrive">
+                            <div class="total-time">{{flightInformation.arriveTime}}</div>
+                        </div>
+                        <div class="end">
+                            <div class="time">{{flightInformation.endTime}}</div>
+                            <div class="plane">{{flightInformation.endAirport}}</div>
+                        </div>
+                    </div>
+                    <div class="price">
+                        <p>￥</p>{{flightInformation.minPrice}}<p>起</p>
+                        <el-button @click="addPriceBox(flightInformation.num)" type="text" class="expend"
+                                   v-if="priceBoxShow.indexOf(flightInformation.num)===-1">展开
+                        </el-button>
+                        <el-button @click="delPriceBox(flightInformation.num)" type="text" class="collapse"
+                                   v-if="priceBoxShow.indexOf(flightInformation.num)!==-1">收起
+                        </el-button>
+                    </div>
+                </div>
+                <el-collapse-transition>
+                    <div v-if="priceBoxShow.indexOf(flightInformation.num)!==-1">
+                        <div class="price-list" v-for="price in flightInformation.prices">
+                            <div v-if="price.num!==0">
+                                <div class="price-type">
+                                    <span class="type">{{price.type}}</span>
+                                    ￥<span class="price">{{price.price}}</span>起
+                                </div>
+                                <el-button class="chose" type="primary"
+                                           @click="scheduledTicket(flightInformation,price)"
+                                           round>预定
+                                </el-button>
+                            </div>
+                        </div>
+                    </div>
+                </el-collapse-transition>
+            </div>
+        </div>
+    </article>
+    <footer id="footer">
+        <p>©2023 孙康平</p>
+    </footer>
+</div>
+<script src="js/vue-cookies.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+    new Vue({
+        el: "#app",
+        mounted: function () {
+            this.getCityInfo();
+            this.getUserInfo();
+        },
+        methods: {
+            //预定机票
+            scheduledTicket(flightInformation, price) {
+                let startTime = flightInformation.startTime;
+                startTime = this.value1 + "T" + startTime;
+                let date = new Date(startTime);
+                let date1 = new Date();
+                let number = date - date1;
+                console.log(number);
+                if (number <= 4 * 60 * 60 * 1000) {
+                    this.$message.warning('不允许预定四小时内起飞的机票');
+                    return;
+                }
+                sessionStorage.setItem("ticketId", price.id);
+                window.location = "/order.html";
+            },
+            //获得城市信息
+            getCityInfo() {
+                axios({
+                    method: 'get',
+                    url: '/city',
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.options = res.data.data;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错啦，请稍后再试");
+                    }
+                })
+            },
+            //获取用户信息
+            getUserInfo() {
+                // this.isLogin=false;
+                let userid = this.$cookies.get('userid');
+                if (userid === null) return;
+                axios({
+                    method: 'get',
+                    url: '/user/' + userid,
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.userinfo = res.data.data;
+                        this.isLogin = true;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错啦，请稍后再试");
+                    }
+                })
+            },
+            //展开机票信息
+            addPriceBox(index) {
+                this.priceBoxShow.push(index);
+            },
+            //收起机票信息
+            delPriceBox(index) {
+                this.priceBoxShow.splice(this.priceBoxShow.indexOf(index));
+            },
+
+            //查询机票信息
+            onSubmit() {
+                if (this.startCity[1] === null || this.startCity.length === 0) {
+                    this.$message.warning("请选择出发城市");
+                    return
+                }
+                if (this.arriveCity[1] === null || this.arriveCity.length === 0) {
+                    this.$message.warning("请选择到达城市");
+                    return
+                }
+                if (this.value1 === null || this.value1 === "") {
+                    this.$message.warning("请选择时间");
+                    return
+                }
+                this.showInfo = 0;
+                this.loadingInfo = true;
+                this.priceBoxShow = [];
+                axios({
+                    method: 'post',
+                    url: '/ticket',
+                    data: {
+                        startCity: this.startCity[1],
+                        endCity: this.arriveCity[1],
+                        time: this.value1.toString(),
+                    }
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.flightInformationS = res.data.data;
+                    } else if (res.data.code === 300) {
+                        this.$message.warning(res.data.msg);
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错啦，请稍后再试");
+                    }
+                    if (this.flightInformationS.length === 0)
+                        this.showInfo = 1;
+                    else
+                        this.showInfo = 2;
+                    this.loadingInfo = false;
+                })
+            },
+        },
+        data() {
+            return {
+                //时间选择器限定
+                pickerOptions: {
+                    disabledDate(time) {
+                        let curDate = (new Date()).getTime();
+                        let three = 30 * 24 * 3600 * 1000;
+                        let threeMonths = curDate + three;
+                        return time.getTime() < Date.now() - 8.64e7 || time.getTime() > threeMonths;
+                    }
+                },
+                priceBoxShow: [],
+                flightInformationS: [],
+                userinfo: {},
+                value1: '',
+                value2: '',
+                showInfo: 0,
+                loadingInfo: false,
+                startCity: [],
+                arriveCity: [],
+                isLogin: false,
+                //级联选择器
+                options: []
+            }
+        }
+    })
+</script>
+</body>
+</html>

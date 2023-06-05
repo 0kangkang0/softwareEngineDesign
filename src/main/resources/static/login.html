@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ch">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录</title>
+    <link rel="shortcut icon" href="img/img.png" type="image/x-icon"/>
+    <style>
+        #err_msg {
+            color: red;
+            align-content: center;
+        }
+    </style>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.7.14/vue.js"></script>
+    <!-- 引入样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css" rel="stylesheet">
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/index.min.js"></script>
+    <link rel="stylesheet" href="css/global.css">
+</head>
+
+<body>
+<div id="app">
+    <div id="login_box">
+        <h2>LOGIN</h2>
+        <div class="input_box">
+            <p id="err_msg">{{err_msg}}</p>
+            <label>
+                <el-input v-model="login_data.username" placeholder="请输入用户名" id="input_box"></el-input>
+            </label>
+        </div>
+        <div class="demo-input-suffix">
+            <el-input placeholder="请输入密码" v-model="login_data.password" show-password id="input_box"></el-input>
+        </div>
+        <div>
+            <button @click="login">登录</button>
+        </div>
+        <a style="display: inline;margin-right: 80px" href="index.html"><p style="display: inline" align="left">
+            返回首页</p></a>
+        <a style="display: inline;margin-left: 80px" href="register.html"><p style="display: inline" align="right">
+            点我注册</p></a>
+        <br>
+    </div>
+</div>
+<script src="js/hash.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+
+<script>
+    new Vue({
+        el: "#app",
+        mounted: function () {
+
+        },
+        methods: {
+
+            //点击登录后执行方法
+            login() {
+                const password = this.login_data.password;
+                this.login_data.password = hex_md5(this.login_data.password);
+                axios({
+                    method: "post",
+                    url: "/user",
+                    data: this.login_data,
+                }).then(res => {
+                    if (res.data.code === 300) {
+                        this.err_msg = res.data.msg;
+                        this.login_data.password = password;
+                    } else if (res.data.code === 200) {
+                        window.location = "index.html";
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错了，请稍后再试");
+                        this.login_data.password = password;
+                    }
+                })
+
+            }
+        },
+        data() {
+            return {
+                login_data: {
+                    username: '',
+                    password: '',
+                    id: '',
+                },
+                err_msg: ''
+            }
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kangkang.mapper.TicketMapper">
+
+    <select id="selectAllTicketByRouterId" resultType="com.kangkang.pojo.Ticket">
+        select * from software_engine_design.ticket where route_id=#{id};
+    </select>
+</mapper>

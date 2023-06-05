@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>闽江航空</title>
+    <link rel="stylesheet" href="css/head.css">
+    <link rel="shortcut icon" href="img/img.png" type="image/x-icon"/>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.7.14/vue.js"></script>
+    <!-- 引入样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css" rel="stylesheet">
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/index.min.js"></script>
+    <link href="css/footer.css" rel="stylesheet">
+    <style>
+        #main {
+            padding-top: 3.90vw;
+            width: 60%;
+            margin: 0 auto;
+        }
+
+        #main .logo .el-form-item__label {
+            height: 7.03vw;
+            line-height: 7.03vw;
+        }
+
+        .avatar-uploader .el-upload {
+            border: 1px dashed #d9d9d9;
+            border-radius: 0.39vw;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-uploader .el-upload:hover {
+            border-color: #409EFF;
+        }
+
+        .avatar-uploader-icon {
+            font-size: 1.82vw;
+            color: #8c939d;
+            width: 7.03vw;
+            height: 7.03vw;
+            line-height: 7.03vw;
+            text-align: center;
+        }
+
+        .avatar {
+            width: 7.03vw;
+            height: 7.03vw;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <header id="header">
+        <img src="img/img.png" alt="小图标" id="airplane_icon">
+        <a v-if="isLogin===true" href="personInfo.html" id="is-login">
+            <el-avatar :size="'large'" :src="'resources/'+form.logo"></el-avatar>
+        </a>
+        <a v-if="isLogin===false" href="login.html" id="login"><p>登录|注册</p></a>
+        <a href="myOrder.html" id="order"><p>我的订单</p></a>
+        <a href="scheduled.html" id="scheduled"><p>机票预定</p></a>
+        <a href="information.html" id="information"><p>航班信息</p></a>
+        <a href="index.html" id="main_page"><p>首页</p></a>
+        <h1 id="head_text">闽江航空</h1>
+    </header>
+    <article id="main">
+        <el-form ref="form" :model="form" label-width="80px">
+            <el-form-item label="头像" class="logo">
+                <el-upload
+                        class="avatar-uploader"
+                        action="resources/upload"
+                        :show-file-list="false"
+                        :on-success="handleAvatarSuccess"
+                        :before-upload="beforeAvatarUpload">
+                    <img v-if="imageUrl" :src="imageUrl" class="avatar" alt="">
+                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
+            </el-form-item>
+            <el-form-item label="用户名" label-width="80px">
+                <el-input v-model="form.username"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" label-width="80px">
+                <el-input v-model="form.newPassword"></el-input>
+            </el-form-item>
+            <el-form-item label="确认密码" label-width="80px">
+                <el-input v-model="form.passwordAgain"></el-input>
+            </el-form-item>
+            <el-button type="primary" @click="save" round class="option">保存</el-button>
+        </el-form>
+    </article>
+    <footer id="footer">
+        <p>©2023 孙康平</p>
+    </footer>
+</div>
+<script src="js/hash.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+<script src="js/vue-cookies.js"></script>
+<script>
+    new Vue({
+        el: "#app",
+        mounted: function () {
+            this.getUserInfoForm();
+        },
+        methods: {
+            getUserInfoForm() {
+                let userid = this.$cookies.get("userid");
+                if (userid === null) return;
+                axios({
+                    method: 'get',
+                    url: 'user/' + userid,
+                }).then(res => {
+                    if (res.data.code !== 200) {
+                        this.$message.error("出错了，请稍后再试")
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.form.id = res.data.data.id;
+                        this.form.username = res.data.data.username;
+                        this.form.logo = res.data.data.logo;
+                        this.imageUrl = 'resources/' + this.form.logo;
+                        this.isLogin = true;
+                    }
+                })
+            },
+            save() {
+                let password = null;
+                if (this.form.newPassword.length !== 0 || this.form.passwordAgain.length !== 0) {
+                    if (this.form.newPassword.length !== this.form.passwordAgain.length) {
+                        this.$message.warning("两次的密码不一样");
+                        return;
+                    } else if (this.form.newPassword.length < 6) {
+                        this.$message.warning('密码不小于六位');
+                        return;
+                    } else if (!(/[a-z]/.test(this.form.newPassword) && /[A-Z]/.test(this.form.newPassword) && /[0-9]/.test(this.form.newPassword))) {
+                        this.$message.warning('密码需包含大小写字母、数字');
+                        return;
+                    }
+                    password = hex_md5(this.form.newPassword)
+                }
+                if (this.form.username.length === 0) {
+                    this.$message.warning("用户名不能为空");
+                    return;
+                }
+                axios({
+                    url: '/user',
+                    method: 'put',
+                    data: {
+                        id: this.form.id,
+                        logo: this.form.logo,
+                        password: password,
+                        username: this.form.username,
+                    },
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.$message.success("修改成功");
+                        this.getUserInfoForm();
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错了，请稍后再试");
+                    }
+                })
+            },
+            handleAvatarSuccess(res, file) {
+                this.form.logo = res.data.data;
+                this.imageUrl = 'resources/' + this.form.logo;
+            },
+            beforeAvatarUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG) {
+                    this.$message.error('上传头像图片只能是 JPG 格式!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return isJPG && isLt2M;
+            }
+        },
+        data() {
+            return {
+                form: {
+                    id: '',
+                    username: '',
+                    newPassword: '',
+                    passwordAgain: '',
+                    logo: '',
+                },
+                imageUrl: '',
+                isLogin: false,
+            }
+        }
+    })
+</script>
+</body>
+</html>

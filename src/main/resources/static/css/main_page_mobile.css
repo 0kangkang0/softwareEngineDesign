@@ -1,0 +1,11 @@
+.main .nut-swiper{
+    height: auto;
+    margin: 10px auto;
+}
+.main .nut-swiper a{
+    height: 441px;
+}
+.main .nut-swiper img{
+    width: 80%;
+    margin: 0 10%;
+}

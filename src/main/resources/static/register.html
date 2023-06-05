@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ch">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册</title>
+    <link rel="shortcut icon" href="img/img.png" type="image/x-icon"/>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.7.14/vue.js"></script>
+    <!-- 引入样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css" rel="stylesheet">
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/index.min.js"></script>
+    <style>
+        #err_msg {
+            color: red;
+            align-content: center;
+        }
+
+        #input_box {
+            border: 0;
+            width: 60%;
+            font-size: 15px;
+            color: #fff;
+            background: transparent;
+            border-bottom: 2px solid #fff;
+            padding: 5px 10px;
+            outline: none;
+            margin-top: 10px;
+        }
+    </style>
+    <link rel="stylesheet" href="css/global.css">
+</head>
+<body style="background: url(https://cdn.luogu.com.cn/upload/image_hosting/ztkbl1a3.png)no-repeat;background-size: 100%">
+<div id="app">
+    <div id="login_box" style="margin-left: 60%">
+        <h2>REGISTER</h2>
+        <div class="input_box">
+            <p id="err_msg">{{err_msg}}</p>
+            <label>
+                <el-input v-model="register_data.username" placeholder="请输入用户名" id="input_box"></el-input>
+            </label>
+        </div>
+        <div class="demo-input-suffix">
+            <el-input placeholder="请输入密码" v-model="register_data.password" show-password id="input_box"></el-input>
+        </div>
+        <div class="input_box" style="padding-top: 10px;display: inline">
+            <el-input placeholder="验证码" v-model="register_data.checkCode" id="input_box"
+                      style="width: 50%;margin-left: 5%"></el-input>
+            <el-image
+                    @click="flush"
+                    style="width: 100px; height: 50px"
+                    :src="url"
+                    :fit="'contain'" id="checkCodeImg"></el-image>
+        </div>
+        <button @click="register">注册</button>
+        <br>
+        <a style="float: left" href="index.html"><p align="right">返回首页</p></a>
+        <a href="login.html"><p align="right">点我登录</p></a>
+    </div>
+</div>
+<script src="js/hash.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+
+<script>
+    new Vue({
+        el: "#app",
+        methods: {
+            flush() {
+                this.url='/register?'+Math.random();
+            },
+            //点击注册后执行方法
+            register(val) {
+                if(this.register_data.password.length<6){
+                    this.err_msg='密码不小于六位';
+                }else if(!(/[a-z]/.test(this.register_data.password)&&/[A-Z]/.test(this.register_data.password)&&/[0-9]/.test(this.register_data.password))){
+                    this.err_msg='密码需包含大小写字母、数字';
+                }else {
+                    const password = this.register_data.password;
+                    this.register_data.password = hex_md5(this.register_data.password);
+                    axios({
+                        method: "post",
+                        url: "register",
+                        data: this.register_data,
+                    }).then(res => {
+                        if (res.data.code===200) {
+                            this.$message.success('注册成功,3s后跳转');
+                            setTimeout(function (){window.location = "/login.html"},3000);
+                        } else{
+                            this.err_msg = res.data.msg;
+                            this.register_data.password=password;
+                            this.flush();
+                        }
+                    })
+                }
+            }
+        },
+        data() {
+            return {
+                url: '/register',
+                register_data: {
+                    username: '',
+                    password: '',
+                    checkCode:'',
+                },
+                err_msg: ''
+            }
+        }
+    })
+</script>
+</body>
+</html>

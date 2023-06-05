@@ -1,0 +1,16 @@
+
+#main_page {
+    background: rgba(28, 105, 101, 0.44);
+    margin-top: 0;
+    height: 2.27vw;
+    width: 10.41vw;
+    padding-top: 1vw;
+}
+
+#main {
+    padding-top: 3.25vw;
+}
+
+#main img {
+    width: 100%;
+}

@@ -1,0 +1,42 @@
+#main{
+    padding-top: 3.25vw;
+}
+#main .flight{
+    /*width: 100%;*/
+    width: auto;
+    margin: 0 15.82vw;
+    height: 4.31vw;
+}
+.flight li{
+    display: inline-block;
+    margin: 0;
+    /*float: left;*/
+    list-style-type: none;
+    transform: skewX(30deg);
+    padding: 1.31vw 3.9vw 1.32vw 3.9vw;
+}
+#main .flight li a p{
+    /*font-weight: 100;*/
+    font-size: 1.3vw;
+    font-weight: unset;
+    font-family: 微软雅黑, serif;
+}
+.ticket_process{
+    color: #4798ef;
+    background-color: #284267;
+}
+.ticket_process .active{
+    color: white;
+    background-color: #3a8ee6;
+}
+.flight div{
+    transform: skewX(-30deg);
+}
+.flight div a:active{
+    color: #4798ef;
+}
+#main a:active,
+#main a:link,#main a:visited {
+    text-decoration: none;
+    color: #4798ef;
+}

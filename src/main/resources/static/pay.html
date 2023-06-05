@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>闽江航空</title>
+    <link rel="stylesheet" href="css/head.css">
+    <link rel="shortcut icon" href="img/img.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="css/orderFlight.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.7.14/vue.js"></script>
+    <!-- 引入样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css" rel="stylesheet">
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/index.min.js"></script>
+    <link href="css/footer.css" rel="stylesheet">
+    <style>
+        #scheduled {
+            background: rgba(28, 105, 101, 0.44);
+            margin-top: 0;
+            height: 2.29vw;
+            width: 10.41vw;
+            padding-top: 0.97vw;
+        }
+
+        #main .active a:active {
+            color: white;
+        }
+
+        #main .ticket-info {
+            width: 60%;
+            margin: 0 auto;
+        }
+
+        #main .ticket-info .title-text {
+            margin: 0.65vw auto 0;
+            background-color: #2f71bd;;
+            height: 3.25vw;
+            color: white;
+        }
+
+        #main .ticket-info .ticket-desc {
+            padding-top: 0.65vw;
+            padding-bottom: 0.65vw;
+            border: 1px solid gainsboro;
+        }
+
+        #main .ticket-info p {
+            line-height: 3.25vw;
+            padding-left: 1.30vw;
+            font-size: 1.62vw;
+        }
+
+        #main .ticket-info .margin-top {
+            width: 99%;
+            margin: 0 auto;
+        }
+
+        #main .price {
+            width: 60%;
+            margin: 0 auto;
+            height: 3.25vw;
+            background-image: linear-gradient(to right, orange, #ff7300);
+        }
+
+        #main .price p {
+            float: left;
+            margin-left: 0.65vw;
+            line-height: 3.25vw;
+            font-size: 1.62vw;
+            color: white;
+        }
+
+        .el-descriptions-item__cell {
+            font-size: 0.5vw;
+        }
+
+        #main .price .num {
+            float: right;
+            margin-right: 0.65vw;
+        }
+
+        #main .button {
+            width: 60%;
+            margin: 0.65vw auto;
+        }
+
+        #main .button .pre-step {
+            border: 0;
+            margin-left: 1.3vw;
+            margin-bottom: 1.3vw;
+            background-image: linear-gradient(to right, #3fc3fc, #409EFF);
+        }
+
+        #main .button .next-step {
+            border: 0;
+            float: right;
+            margin-right: 1.3vw;
+            margin-bottom: 1.3vw;
+            background-image: linear-gradient(to right, orange, #ff7300);
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <header id="header">
+        <img src="img/img.png" alt="小图标" id="airplane_icon">
+        <a v-if="isLogin===true" href="personInfo.html" id="is-login">
+            <el-avatar :size="'large'" :src="'resources/'+userinfo.logo"></el-avatar>
+        </a>
+        <a v-if="isLogin===false" href="login.html" id="login"><p>登录|注册</p></a>
+        <a href="myOrder.html" id="order"><p>我的订单</p></a>
+        <a href="#" id="scheduled"><p>机票预定</p></a>
+        <a href="information.html" id="information"><p>航班信息</p></a>
+        <a href="index.html" id="main_page"><p>首页</p></a>
+        <h1 id="head_text">闽江航空</h1>
+    </header>
+    <article id="main">
+        <div class="ticket_process">
+            <ul class="flight">
+                <li class="chose">
+                    <div><a id="chose-box" href="scheduled.html"><p>1.选择航班</p></a></div>
+                </li>
+                <li class="ordered">
+                    <div><a id="ordered-box" href="order.html"><p>2.填写订单</p></a></div>
+                </li>
+                <li class="pay active">
+                    <div><a id="pay-box"><p>3.确认并支付</p></a></div>
+                </li>
+                <li class="end">
+                    <div><a id="end-box"><p>4.出票完成</p></a></div>
+                </li>
+            </ul>
+        </div>
+        <div class="ticket-info">
+            <div class="title-text">
+                <p>机票信息</p>
+            </div>
+            <div class="ticket-desc">
+                <el-descriptions class="margin-top" :column="3" border>
+                    <el-descriptions-item>
+                        <template slot="label">
+                            航班号
+                        </template>
+                        {{ticketInfo.flightNo}}
+                    </el-descriptions-item>
+                    <el-descriptions-item>
+                        <template slot="label">
+                            座舱
+                        </template>
+                        {{ticketInfo.type}}
+                    </el-descriptions-item>
+                    <el-descriptions-item>
+                        <template slot="label">
+                            路线
+                        </template>
+                        {{ticketInfo.startAirport}}——>{{ticketInfo.endAirport}}
+                    </el-descriptions-item>
+                    <el-descriptions-item>
+                        <template slot="label">
+                            姓名
+                        </template>
+                        {{form.name}}
+                    </el-descriptions-item>
+                    <el-descriptions-item>
+                        <template slot="label">
+                            证件号
+                        </template>
+                        {{form.idNumber}}
+                    </el-descriptions-item>
+                    <el-descriptions-item>
+                        <template slot="label">
+                            电话
+                        </template>
+                        {{form.tel}}
+                    </el-descriptions-item>
+                </el-descriptions>
+            </div>
+        </div>
+        <div class="price">
+            <p>价格：</p>
+            <p class="num">{{ticketInfo.price}}</p>
+        </div>
+        <div class="button">
+            <el-button type="primary" @click="changePage" round class="pre-step">重新填写信息</el-button>
+            <el-button type="primary" @click="PayTicket" round class="next-step">下一步</el-button>
+        </div>
+    </article>
+    <footer id="footer">
+        <p>©2023 孙康平</p>
+    </footer>
+</div>
+<script src="js/axios-0.18.0.js"></script>
+<script src="js/vue-cookies.js"></script>
+<script type="module">
+
+    new Vue({
+        el: "#app",
+        mounted: function () {
+            this.getUserInfo();
+            let item = sessionStorage.getItem("ticketInfo");
+            let item1 = sessionStorage.getItem("form");
+            if (item === null || item1 === null) {
+                this.$message.warning("请填写乘客信息");
+                setTimeout(function () {
+                    window.location = "order.html"
+                }, 3000);
+            }
+            this.ticketInfo = JSON.parse(item);
+            this.form = JSON.parse(item1);
+        },
+        methods: {
+            changePage() {
+                window.location = '/order.html';
+            },
+            getUserInfo() {
+                let userid = this.$cookies.get('userid');
+                if (userid === null) return;
+                axios({
+                    method: 'get',
+                    url: '/user/' + userid,
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.userinfo = res.data.data;
+                        this.isLogin = true;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错啦，请稍后再试");
+                    }
+                })
+            },
+            PayTicket() {
+                axios({
+                    method: 'post',
+                    url: '/order',
+                    data: {
+                        userId: this.$cookies.get('userid'),
+                        ticketId: this.ticketInfo.id,
+                        name: this.form.name,
+                        idNumber: this.form.idNumber,
+                        tel: this.form.tel,
+                        mail: this.form.mail,
+                    }
+                }).then(res => {
+                    if (res.data.code !== 200) {
+                        this.$message.error("出错了，请稍后再试");
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        sessionStorage.removeItem("ticketInfo");
+                        sessionStorage.removeItem("form");
+                        sessionStorage.removeItem("ticketId");
+                        window.location = "finish.html"
+                    }
+                })
+            }
+        },
+        data() {
+            return {
+                ticketInfo: {},
+                form: {},
+                userinfo: {},
+                isLogin: false,
+            }
+        }
+    })
+</script>
+</body>
+</html>

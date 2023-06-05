@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>闽江航空</title>
+    <link rel="stylesheet" href="css/head.css">
+    <link rel="shortcut icon" href="img/img.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="css/orderFlight.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.7.14/vue.js"></script>
+    <!-- 引入样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css" rel="stylesheet">
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/index.min.js"></script>
+    <link href="css/footer.css" rel="stylesheet">
+    <style>
+        #scheduled {
+            background: rgba(28, 105, 101, 0.44);
+            margin-top: 0;
+            height: 2.27vw;
+            width: 10.41vw;
+            padding-top: 1vw;
+        }
+
+        #main .active a:active {
+            color: white;
+        }
+
+        #main .finish {
+            text-align: center;
+            width: 60%;
+            margin: 6.51vw auto;
+        }
+
+        #main .finish .text {
+            font-size: 6.51vw;
+            font-family: "楷体", serif;
+            background-image: -webkit-linear-gradient(top, #3fc3fc, #409EFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #main .finish .button .pre-step, #main .finish .button .next-step {
+            margin: 1.30vw 6.51vw;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <header id="header">
+        <img src="img/img.png" alt="小图标" id="airplane_icon">
+        <a v-if="isLogin===true" href="personInfo.html" id="is-login">
+            <el-avatar :size="'large'" :src="'resources/'+userinfo.logo"></el-avatar>
+        </a>
+        <a v-if="isLogin===false" href="login.html" id="login"><p>登录|注册</p></a>
+        <a href="myOrder.html" id="order"><p>我的订单</p></a>
+        <a href="#" id="scheduled"><p>机票预定</p></a>
+        <a href="information.html" id="information"><p>航班信息</p></a>
+        <a href="index.html" id="main_page"><p>首页</p></a>
+        <h1 id="head_text">闽江航空</h1>
+    </header>
+    <article id="main">
+        <div class="ticket_process">
+            <ul class="flight">
+                <li class="chose">
+                    <div><a id="chose-box"><p>1.选择航班</p></a></div>
+                </li>
+                <li class="ordered">
+                    <div><a id="ordered-box"><p>2.填写订单</p></a></div>
+                </li>
+                <li class="pay">
+                    <div><a id="pay-box"><p>3.确认并支付</p></a></div>
+                </li>
+                <li class="end active">
+                    <div><a id="end-box"><p>4.出票完成</p></a></div>
+                </li>
+            </ul>
+        </div>
+        <div class="finish">
+            <div class="text">购买完成</div>
+            <div class="button">
+                <el-button type="primary" @click="changePage('/index.html')" round class="pre-step">首页</el-button>
+                <el-button type="primary" @click="changePage('/myOrder.html')" round class="next-step">查看订单</el-button>
+            </div>
+        </div>
+    </article>
+    <footer id="footer">
+        <p>©2023 孙康平</p>
+    </footer>
+</div>
+<script src="js/vue-cookies.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+    new Vue({
+        el: "#app",
+        mounted: function () {
+            this.getUserInfo();
+        },
+        methods: {
+            changePage(val) {
+                window.location = val;
+            },
+            //获取用户信息
+            getUserInfo() {
+                // this.isLogin=false;
+                let userid = this.$cookies.get('userid');
+                if (userid === null) return;
+                axios({
+                    method: 'get',
+                    url: '/user/' + userid,
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.userinfo = res.data.data;
+                        this.isLogin = true;
+                    }else if(res.data.code===304){
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location=res.data.data;
+                        },3000)
+                    } else {
+                        this.$message.error("出错啦，请稍后再试");
+                    }
+                })
+            },
+        },
+        data() {
+            return {
+                userinfo: {},
+                isLogin: false,
+            }
+        }
+    })
+</script>
+</body>
+</html>

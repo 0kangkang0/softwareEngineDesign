@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>闽江航空</title>
+    <link rel="stylesheet" href="css/head.css">
+    <link rel="shortcut icon" href="img/img.png" type="image/x-icon"/>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.7.14/vue.js"></script>
+    <!-- 引入样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css" rel="stylesheet">
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/index.min.js"></script>
+    <link href="css/footer.css" rel="stylesheet">
+    <style>
+        #information {
+            background: rgba(28, 105, 101, 0.44);
+            margin-top: 0;
+            height: 2.27vw;
+            width: 10.41vw;
+            padding-top: 1vw;
+        }
+
+        #main {
+            padding-top: 3.9vw;
+            text-align: center;
+        }
+
+        #main .demo-form-inline .el-icon-sort {
+            width: 3.25vw;
+            height: 1.95vw;
+            -moz-transform: rotate(-90deg);
+            -webkit-transform: rotate(-90deg);
+        }
+
+        #blue_bar {
+            height: 3.25vw;
+            width: 80%;
+            margin: auto;
+            text-align: left;
+            background-color: #8cc5ff;
+        }
+
+        #blue_bar span {
+            color: white;
+            float: left;
+            margin-left: 1.3vw;
+            margin-top: 0.84vw;
+        }
+
+        #main .empty {
+            width: 100%;
+            height: 13vw;
+        }
+
+        #main .no-info {
+            padding-top: 6.5vw;
+            height: 13vw;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 3.25vw;
+            color: #3fc3fc;
+            font-family: 幼圆, serif;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <header id="header">
+        <img src="img/img.png" alt="小图标" id="airplane_icon">
+        <a v-if="isLogin===true" href="personInfo.html" id="is-login">
+            <el-avatar :size="'large'" :src="'resources/'+userinfo.logo"></el-avatar>
+        </a>
+        <a v-if="isLogin===false" href="login.html" id="login"><p>登录|注册</p></a>
+        <a href="myOrder.html" id="order"><p>我的订单</p></a>
+        <a href="scheduled.html" id="scheduled"><p>机票预定</p></a>
+        <a href="information.html" id="information"><p>航班信息</p></a>
+        <a href="index.html" id="main_page"><p>首页</p></a>
+        <h1 id="head_text">闽江航空</h1>
+    </header>
+    <article id="main">
+        <el-form :inline="true" class="demo-form-inline">
+            <el-form-item>
+                <el-cascader
+                        ref="cascaderAddr"
+                        placeholder="出发城市"
+                        v-model="value"
+                        :options="options"
+                        :show-all-levels="false">
+                </el-cascader>
+            </el-form-item>
+            <i class="el-icon-sort" style=""></i>
+            <el-form-item>
+                <el-cascader
+                        ref="cascaderAddr2"
+                        placeholder="到达城市"
+                        v-model="valueArrive"
+                        :options="options"
+                        :show-all-levels="false">
+                </el-cascader>
+            </el-form-item>
+            <el-form-item>
+                <el-date-picker
+                        v-model="value1"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="选择日期"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="getInfo" round>查询</el-button>
+            </el-form-item>
+        </el-form>
+        <div class="empty" v-if="showInfo === 0" v-loading="loadingInfo">
+
+        </div>
+        <div class="no-info" v-if="showInfo === 1" v-loading="loadingInfo">
+            <i class="el-icon-warning-outline"></i>
+            没有路线信息
+        </div>
+        <div class="has-info" v-if="showInfo === 2" v-loading="loadingInfo">
+            <div style="text-align: center">
+                <div id="blue_bar">
+                    <span>{{startCity}} —— {{arriveCity}}</span>
+                    <span>{{timeInfo}}</span>
+                </div>
+                <el-table
+                        :data="tableData"
+                        border
+                        :header-cell-style="{background:'#eef1f6',color:'#606266'}"
+                        style="width: 80%;margin:auto">
+                    <el-table-column
+                            prop="airNo"
+                            label="航班"
+                            width="180">
+                    </el-table-column>
+                    <el-table-column
+                            prop="route"
+                            label="航班路线"
+                            width="180">
+                    </el-table-column>
+                    <el-table-column
+                            prop="date"
+                            label="航班日期">
+                    </el-table-column>
+                    <el-table-column
+                            prop="startTime"
+                            label="出港时间">
+                    </el-table-column>
+                    <el-table-column
+                            prop="arriveTime"
+                            label="到港时间">
+                    </el-table-column>
+                    <el-table-column
+                            prop="status"
+                            label="状态">
+                    </el-table-column>
+                </el-table>
+            </div>
+        </div>
+    </article>
+    <footer id="footer">
+        <p>©2023 孙康平</p>
+    </footer>
+</div>
+<script src="js/axios-0.18.0.js"></script>
+<script src="js/vue-cookies.js"></script>
+<script>
+    new Vue({
+        el: "#app",
+        mounted: function () {
+            this.getCityInfo();
+            this.getUserInfo();
+        },
+        methods: {
+            //获取用户信息
+            getUserInfo() {
+                // this.isLogin=false;
+                let userid = this.$cookies.get('userid');
+                if (userid === null) return;
+                axios({
+                    method: 'get',
+                    url: '/user/' + userid,
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.userinfo = res.data.data;
+                        this.isLogin = true;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错啦，请稍后再试");
+                    }
+                })
+            },
+            getInfo() {
+                if (this.startCity[1] === null || this.startCity.length === 0) {
+                    this.$message.warning("请选择出发城市");
+                    return
+                }
+                if (this.arriveCity[1] === null || this.arriveCity.length === 0) {
+                    this.$message.warning("请选择到达城市");
+                    return
+                }
+                if (this.value1 === null || this.value1 === "") {
+                    this.$message.warning("请选择时间");
+                    return
+                }
+                this.loadingInfo = true;
+                axios({
+                    url: '/router',
+                    method: 'post',
+                    data: {
+                        startCity: this.value[1],
+                        endCity: this.valueArrive[1],
+                        time: this.value1,
+                    }
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        if (res.data.data.length === 0) {
+                            this.showInfo = 1;
+                        } else {
+                            this.showInfo = 2;
+                            this.tableData = res.data.data;
+                            let labelData = this.$refs.cascaderAddr.getCheckedNodes()[0].pathLabels;
+                            this.startCity = labelData[labelData.length - 1];
+                            labelData = this.$refs.cascaderAddr2.getCheckedNodes()[0].pathLabels;
+                            this.arriveCity = labelData[labelData.length - 1];
+                            this.timeInfo = this.value1;
+                        }
+                    } else if (res.data.code === 300) {
+                        this.$message.error(res.data.msg);
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错了，请稍后再试")
+                    }
+                    this.loadingInfo = false;
+                })
+            },
+            getCityInfo() {
+                axios({
+                    method: 'get',
+                    url: '/city',
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.options = res.data.data;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错啦，请稍后再试");
+                    }
+                })
+            }
+        },
+        data() {
+            return {
+                tableData: [],
+                formInline: {
+                    user: '',
+                    region: ''
+                },
+                pickerOptions: {
+                    disabledDate(time) {
+                        let curDate = (new Date()).getTime();
+                        let three = 30 * 24 * 3600 * 1000;
+                        let threeMonths = curDate + three;
+                        return time.getTime() < Date.now() - 8.64e7 || time.getTime() > threeMonths;
+                    },
+                },
+                userinfo: {},
+                timeInfo: '',
+                value1: '',
+                value2: '',
+                isLogin: false,
+                value: ["F", "福州"],
+                valueArrive: ["Z", "郑州"],
+                startCity: '福州',
+                arriveCity: '郑州',
+                options: [],
+                showInfo: 0,
+                loadingInfo: false,
+            };
+        }
+    })
+</script>
+</body>
+</html>

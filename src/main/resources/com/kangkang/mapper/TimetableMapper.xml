@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kangkang.mapper.TimetableMapper">
+    <insert id="insertAll" parameterType="com.kangkang.pojo.Timetable" useGeneratedKeys="true" keyProperty="id">
+        insert into software_engine_design.timetable(id, scheduled, actual, estimated,type)
+        value (#{id},#{scheduled},#{actual},#{estimated},#{type})
+    </insert>
+</mapper>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>闽江航空</title>
+    <link rel="stylesheet" href="css/head.css">
+    <link rel="shortcut icon" href="img/img.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="css/orderFlight.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.7.14/vue.js"></script>
+    <!-- 引入样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/theme-chalk/index.min.css" rel="stylesheet">
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/index.min.js"></script>
+    <link href="css/footer.css" rel="stylesheet">
+    <style>
+        br {
+            font-size: 0;
+        }
+
+        #main .active a:active {
+            color: white;
+        }
+
+        #scheduled {
+            background: rgba(28, 105, 101, 0.44);
+            margin-top: 0;
+            height: 2.27vw;
+            width: 10.41vw;
+            padding-top: 1vw;
+        }
+
+        #main .flight-info {
+            height: 3.90vw;
+            width: 60%;
+            margin: 0.65vw auto;
+            background-color: #eefffa;
+        }
+
+        #main .flight-info .flight-no {
+            float: left;
+            margin-top: 1.30vw;
+            margin-left: 3.9vw;
+            color: #424242;
+        }
+
+        #main .flight-info .time-info {
+            float: left;
+        }
+
+        #main .flight-info .start {
+            float: left;
+            margin-left: 9.76vw;
+            margin-top: 0.65vw;
+            color: #4b4b4b;
+            text-align: right;
+        }
+
+        #main .flight-info .start .time {
+            font-size: 0.65vw;
+        }
+
+        #main .flight-info .mid {
+            text-align: center;
+            float: left;
+            width: 7.51vw;
+            font-size: 1vw;
+            margin-right: 0.65vw;
+            margin-left: 1.30vw;
+            margin-top: 0.9vw;
+            border-bottom: 1px dashed #4b4b4b;
+        }
+
+        #main .flight-info .end {
+            float: left;
+            margin-top: 0.65vw;
+            color: #4b4b4b;
+            text-align: left;
+        }
+
+        #main .flight-info .end .time {
+            font-size: 0.65vw;
+        }
+
+        .flight-info .total-time {
+            float: left;
+            margin-top: 0.1vw;
+            color: #4b4b4b;
+        }
+
+        #main .passage-info {
+            width: 60%;
+            margin: 0 auto;
+            background-color: #2f71bd;;
+            height: 3.25vw;
+            font-size: 1.04vw;
+            color: white;
+        }
+
+        #main .passage-info .title-text {
+            display: inline;
+            padding-left: 1.30vw;
+            line-height: 3.25vw;
+        }
+
+        #main .passage-info .el-form .el-input__inner {
+            margin-top: 0.65vw;
+            border-radius: 3.25vw;
+            width: 32.55vw;
+            border: 1px dashed #b9b9b9;
+        }
+
+        #main .passage-info .passage-form {
+            border: 1px solid #e8e8e8;
+        }
+
+        #main .passage-info .pre-step {
+            border: 0;
+            margin-left: 1.30vw;
+            margin-bottom: 1.30vw;
+            background-image: linear-gradient(to right, #3fc3fc, #409EFF);
+        }
+
+        #main .passage-info .next-step {
+            border: 0;
+            float: right;
+            margin-right: 1.30vw;
+            margin-bottom: 1.30vw;
+            background-image: linear-gradient(to right, orange, #ff7300);
+        }
+
+        .el-button span {
+            width: 5vw;
+            height: 1vw;
+            font-size: 1vw;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <header id="header">
+        <img src="img/img.png" alt="小图标" id="airplane_icon">
+        <a v-if="isLogin===true" href="personInfo.html" id="is-login">
+            <el-avatar :size="'large'" :src="'resources/'+userinfo.logo"></el-avatar>
+        </a>
+        <a v-if="isLogin===false" href="login.html" id="login"><p>登录|注册</p></a>
+        <a href="myOrder.html" id="order"><p>我的订单</p></a>
+        <a href="#" id="scheduled"><p>机票预定</p></a>
+        <a href="information.html" id="information"><p>航班信息</p></a>
+        <a href="index.html" id="main_page"><p>首页</p></a>
+        <h1 id="head_text">闽江航空</h1>
+    </header>
+    <article id="main">
+        <div class="ticket_process">
+            <ul class="flight">
+                <li class="chose">
+                    <div><a id="chose-box" href="scheduled.html"><p>1.选择航班</p></a></div>
+                </li>
+                <li class="ordered active">
+                    <div><a id="ordered-box"><p>2.填写订单</p></a></div>
+                </li>
+                <li class="pay">
+                    <div><a id="pay-box"><p>3.确认并支付</p></a></div>
+                </li>
+                <li class="end">
+                    <div><a id="end-box"><p>4.出票完成</p></a></div>
+                </li>
+            </ul>
+        </div>
+        <div class="flight-info">
+            <p class="flight-no">{{ticketInfo.flightNo}}</p>
+            <div class="time-info">
+                <div class="start">
+                    {{ticketInfo.startAirport}}
+                    <br/>
+                    {{ticketInfo.startTime}}
+                </div>
+                <div class="mid">{{ticketInfo.arriveTime}}</div>
+                <!--                <div class="total-time">-->
+
+                <!--                </div>-->
+                <div class="end">
+                    {{ticketInfo.endAirport}}
+                    <br/>
+                    {{ticketInfo.endTime}}
+                </div>
+            </div>
+        </div>
+        <div class="passage-info">
+            <div class="title-text">乘机人信息</div>
+            <div class="passage-form">
+                <el-form ref="form" :rules="rules" :model="form" label-width="80px">
+                    <el-form-item label="姓名" prop="name">
+                        <el-input v-model="form.name"></el-input>
+                    </el-form-item>
+                    <el-form-item label="证件号" prop="idNumber">
+                        <el-input v-model="form.idNumber"></el-input>
+                    </el-form-item>
+                    <el-form-item label="手机号" prop="tel">
+                        <el-input v-model="form.tel"></el-input>
+                    </el-form-item>
+                    <el-form-item label="Email">
+                        <el-input v-model="form.email"></el-input>
+                    </el-form-item>
+                </el-form>
+                <el-button type="primary" round @click="changePage" class="pre-step">重新选择航班
+                </el-button>
+                <el-button type="primary" round @click="PayPage" class="next-step">下一步</el-button>
+            </div>
+        </div>
+    </article>
+    <footer id="footer" style="width: 100%;margin-top:25vw;bottom: 16px;text-align: center">
+        <p>©2023 孙康平</p>
+    </footer>
+</div>
+
+<script src="js/axios-0.18.0.js"></script>
+<script src="js/vue-cookies.js"></script>
+<script type="module">
+    new Vue({
+        el: "#app",
+        mounted: function () {
+            let userid = sessionStorage.getItem("ticketId");
+            if (userid === null) {
+                this.$message.warning("请选择机票信息");
+                setTimeout(function () {
+                    window.location = "scheduled.html"
+                }, 3000);
+                return;
+            }
+            this.getUserInfo();
+            axios({
+                method: 'get',
+                url: "/ticket/" + userid,
+            }).then(res => {
+                if (res.data.code !== 200) {
+                    this.$message.error("出错了，请稍后再试");
+                } else if (res.data.code === 304) {
+                    this.$message.error(res.data.msg)
+                    this.$message.warning("3s后进行跳转")
+                    setTimeout(function () {
+                        window.location = res.data.data;
+                    }, 3000)
+                } else {
+                    this.ticketInfo = res.data.data;
+                }
+            })
+        },
+        methods: {
+            changePage() {
+                window.location = '/scheduled.html';
+            },
+            PayPage() {
+                if (this.form.name === null || this.form.name === "") {
+                    this.$message.warning("姓名不能为空");
+                    return;
+                }
+                if (this.form.idNumber === null || this.form.idNumber === "") {
+                    this.$message.warning("身份证号不能为空");
+                    return;
+                }
+                if (this.form.tel === null || this.form.tel === "") {
+                    this.$message.warning("电话不能为空");
+                    return;
+                }
+                sessionStorage.setItem("ticketInfo", JSON.stringify(this.ticketInfo))
+                sessionStorage.setItem("form", JSON.stringify(this.form))
+                window.location = "/pay.html"
+            },
+            //获取用户信息
+            getUserInfo() {
+                // this.isLogin=false;
+                let userid = this.$cookies.get('userid');
+                if (userid === null) return;
+                axios({
+                    method: 'get',
+                    url: '/user/' + userid,
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        this.userinfo = res.data.data;
+                        this.isLogin = true;
+                    } else if (res.data.code === 304) {
+                        this.$message.error(res.data.msg)
+                        this.$message.warning("3s后进行跳转")
+                        setTimeout(function () {
+                            window.location = res.data.data;
+                        }, 3000)
+                    } else {
+                        this.$message.error("出错啦，请稍后再试");
+                    }
+                })
+            },
+        },
+        data() {
+            return {
+                ticketInfo: {
+                    id: '',
+                    flightNo: '',
+                    startTime: '',
+                    arriveTime: '',
+                    endTime: '',
+                    startAirport: '',
+                    endAirport: '',
+                    price: '',
+                    fromTo: '',
+                    type: '',
+                },
+                isLogin: true,
+                userinfo: {},
+                rules: {
+                    name: [
+                        {required: true, message: '请输入姓名', trigger: 'blur'}
+                    ],
+                    idNumber: [
+                        {required: true, message: '请输入证件号码', trigger: 'blur'}
+                    ],
+                    tel: [
+                        {required: true, message: '请输入电话号码', trigger: 'blur'}
+                    ],
+                },
+                form: {
+                    name: '',
+                    idNumber: '',
+                    tel: '',
+                    email: '',
+                }
+            }
+        }
+    })
+</script>
+</body>
+</html>
