@@ -24,7 +24,6 @@ public class AuthorityInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
-        // ①:START 方法注解级拦截器
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         Method method = handlerMethod.getMethod();
         // 判断接口是否需要登录
@@ -32,7 +31,6 @@ public class AuthorityInterceptor implements HandlerInterceptor {
         ManagerRequired managerRequireAnnotation = method.getAnnotation(ManagerRequired.class);
         // 有 @LoginRequired 注解，需要认证
         if (loginRequireAnnotation != null) {
-            // 这写你拦截需要干的事儿，比如取缓存，SESSION，权限判断等
             HttpSession session = request.getSession();
             String userid = (String)session.getAttribute("userid");
             if(userid!=null){
