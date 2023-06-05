@@ -5,7 +5,7 @@
 
     这里的username需要改成自己发送邮件的邮箱
     
-    password为发送邮件邮箱的STMT码
+    password为发送邮件邮箱的SMTP码
 
     同时，要将数据库的连接信息改成自己的
 
