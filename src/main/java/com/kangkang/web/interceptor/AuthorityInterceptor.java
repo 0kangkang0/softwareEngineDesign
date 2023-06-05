@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 
 @Component
 public class AuthorityInterceptor implements HandlerInterceptor {
